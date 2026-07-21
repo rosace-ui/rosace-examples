@@ -1,0 +1,19 @@
+# Standalone hot-reload demo app — the reference for how a `view!`/hot-reload
+# app is structured (D103 Tier 1). The empty `[workspace]` table makes this its
+# OWN workspace, so the parent rosace workspace's release regression never
+# builds it: a hot-reload app is authored in dev (`rsc dev`, rsc-hot on) and
+# is free to use the full `view!` widget vocabulary via the inflate path, not
+# only the release-compatible subset. Mirrors the `my_app`/`demo_app` pattern.
+[package]
+name = "hot_reload_demo"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[[bin]]
+name = "hot_reload_demo"
+path = "src/main.rs"
+
+[dependencies]
+rosace = { path = "../../rosace" }
