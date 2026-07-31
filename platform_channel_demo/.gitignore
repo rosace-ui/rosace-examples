@@ -1,0 +1,14 @@
+# Rust build
+/target
+/dist
+*.app
+
+# macOS
+.DS_Store
+
+# Mobile build outputs
+/android/**/build/
+/android/.gradle/
+/android/**/jniLibs/
+/ios/build/
+**/xcuserdata/
