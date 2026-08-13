@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Dev hot reload (Tier 1) binds a localhost socket to receive pushed
+         `view!` edits over `adb forward`. INTERNET covers the localhost bind;
+         it has no effect on a release build (no socket is opened). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Camera permission demo (Platform Channel showcase) — added by hand
+         for this app only, not part of the shared rsc-cli generator (an app
+         that never touches the camera shouldn't carry this). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode|fontScale"
+            android:windowSoftInputMode="adjustNothing"
+            android:label="showcase">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

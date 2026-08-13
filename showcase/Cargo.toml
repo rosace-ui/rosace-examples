@@ -1,0 +1,26 @@
+[package]
+name = "showcase"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[lib]
+name = "showcase"
+crate-type = ["cdylib", "staticlib", "rlib"]
+path = "src/lib.rs"
+
+[[bin]]
+name = "showcase"
+path = "src/main.rs"
+
+[dependencies]
+rosace = { path = "/Users/godwinjoseph/Development/Tezzera/rosace" }
+rosace-ffi = { path = "/Users/godwinjoseph/Development/Tezzera/rosace-ffi" }
+serde_json = "1"
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21"
+
+[build-dependencies]
+rosace-asset-codegen = { path = "/Users/godwinjoseph/Development/Tezzera/rosace-asset-codegen" }

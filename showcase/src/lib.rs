@@ -1,0 +1,155 @@
+//! showcase — a ROSACE app.
+//!
+//! `launch()` is shared by every platform. The native binary calls it from
+//! `main`; the web build calls it from a `wasm-bindgen(start)` entry.
+
+mod app;
+mod feedback;
+mod ffi;
+mod screens;
+mod theme;
+
+/// Typed handles for everything under `assets/`, generated at build time by
+/// `build.rs`. Refer to assets as `assets::LOGO` (typo-proof, autocompletes)
+/// rather than raw strings. Add a file to `assets/` and it appears here.
+pub mod assets {
+    include!(concat!(env!("OUT_DIR"), "/rosace_assets.rs"));
+}
+
+use rosace::prelude::*;
+
+/// The channel name for this app's own custom method (the "native calls
+/// Rust, synchronously" direction — see `screens::platform_channel`'s doc
+/// for the full picture). Channel names are just strings you pick — using
+/// your bundle id as a prefix (like a Java package) avoids collisions with
+/// other libraries' channels in the same app.
+pub const MATH_CHANNEL: &str = "dev.rosace.showcase/math";
+
+/// One-time app startup — register Platform Channel method handlers here
+/// (`rosace_ffi::set_method_call_handler`), or anything else that must run
+/// exactly once before the engine starts.
+///
+/// Called from EVERY entry point below (`launch`, and — on iOS/Android —
+/// `ffi.rs`'s `rsc_engine_init`/`nativeInit`), not just this one: mobile's
+/// FFI entry points construct the engine directly and never call `launch`,
+/// so code that only ran here would silently never execute on iOS/Android
+/// (found live: a Platform Channel handler registered only in `launch`
+/// answered every call with "no handler registered" on mobile until its
+/// registration moved here instead).
+pub(crate) fn app_init() {
+    // So system-brightness switching (`rosace_theme::sync_system_theme`,
+    // driven by the native OS-appearance push) applies THIS app's themes
+    // instead of the framework's generic built-in light/dark — otherwise a
+    // customized `theme.rs` would silently stop mattering the moment the OS
+    // flips dark mode.
+    rosace::theme::register_theme_pair(theme::light(), theme::dark());
+
+    // Registers the starter shader material library (`gradient`/`noise`/
+    // `glow`) so the ShaderPaint/Container/AppBar "shader material" demo
+    // pages in the widget catalog resolve their pipelines.
+    materials::register_starter_materials();
+
+    rosace_ffi::set_method_call_handler(MATH_CHANNEL, Box::new(|method, args| {
+        match method {
+            "add" => {
+                let nums: Vec<i64> = serde_json::from_value(args)
+                    .map_err(|e| format!("expected a JSON array of numbers: {e}"))?;
+                Ok(serde_json::Value::from(nums.iter().sum::<i64>()))
+            }
+            other => Err(format!("unknown method '{other}' on {MATH_CHANNEL}")),
+        }
+    }));
+}
+
+/// Start the app. Runs the winit event loop on native; hands off to the
+/// browser's requestAnimationFrame loop on web.
+pub fn launch() {
+    app_init();
+    // Window size applies on desktop; mobile is always fullscreen.
+    App::new()
+        .title("showcase")
+        .size(960, 640)
+        .themes(theme::themes())
+        .launch(app::AppRoot);
+}
+
+/// Web (wasm) entry — invoked automatically when the module is instantiated.
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn start() {
+    launch();
+}
+
+#[cfg(test)]
+mod catalog_tests {
+    //! Every catalog page is painted headlessly here.
+    //!
+    //! Compiling proves nothing about a demo screen: a page that panics on
+    //! its first paint, or lays out to nothing, or silently paints an empty
+    //! rect, compiles perfectly. This walks `WidgetKind::ALL`, so a widget
+    //! added to the catalog is covered the moment it is listed — there is no
+    //! second place to remember to update.
+
+    use crate::app::{WidgetDemoState, WidgetKind};
+    use rosace::prelude::*;
+    use rosace::FrameEngine;
+    use rosace::{FontCache, SkiaCanvas};
+
+    /// Renders one detail page. `WidgetDemoState` needs a real `Context` to
+    /// allocate its atoms, so the page has to be built inside a `Component`.
+    struct Page(WidgetKind);
+
+    impl Component for Page {
+        fn build(&self, ctx: &mut Context) -> Element {
+            let demo = WidgetDemoState::new(ctx);
+            crate::screens::widgets::widget_detail_screen(self.0, &demo).into_element()
+        }
+    }
+
+    /// Paints twice. The second frame is what catches a page that only works
+    /// once — `Responsive` runs its builder on both the layout and the paint
+    /// pass, so a page that hands its content over instead of rebuilding it
+    /// renders the first frame and then goes blank.
+    fn painted_pixels(kind: WidgetKind) -> usize {
+        let mut e = FrameEngine::new(Box::new(Page(kind)), FontCache::embedded());
+        let (mut c, mut o) = (SkiaCanvas::new(420, 800), SkiaCanvas::new(420, 800));
+        e.paint(&mut c, &mut o, &[]);
+        e.paint(&mut c, &mut o, &[]);
+        // Count pixels that are not fully transparent.
+        c.pixels().chunks_exact(4).filter(|px| px[3] != 0).count()
+    }
+
+    #[test]
+    fn every_catalog_page_paints_something() {
+        let mut blank = Vec::new();
+        for kind in WidgetKind::ALL {
+            let n = painted_pixels(*kind);
+            // A real page fills a 420x800 viewport with a background at
+            // minimum; a few hundred pixels means it laid out to nothing.
+            if n < 10_000 {
+                blank.push(format!("  {} painted only {n} pixels", kind.name()));
+            }
+        }
+        assert!(blank.is_empty(), "catalog pages that render (almost) nothing:\n{}", blank.join("\n"));
+    }
+
+    #[test]
+    fn every_catalog_page_announces_something() {
+        // Quality Bar §5 at the page level: a screen that declares no
+        // semantics at all is unusable with a screen reader.
+        let mut silent = Vec::new();
+        for kind in WidgetKind::ALL {
+            let mut e = FrameEngine::new(Box::new(Page(*kind)), FontCache::embedded());
+            let (mut c, mut o) = (SkiaCanvas::new(420, 800), SkiaCanvas::new(420, 800));
+            e.paint(&mut c, &mut o, &[]);
+            fn count(n: &rosace::SemanticNode) -> usize {
+                (if n.role != Role::Unknown || n.label.is_some() { 1 } else { 0 })
+                    + n.children.iter().map(count).sum::<usize>()
+            }
+            if count(&e.semantics()) == 0 {
+                silent.push(format!("  {}", kind.name()));
+            }
+        }
+        assert!(silent.is_empty(), "catalog pages with no semantics:\n{}", silent.join("\n"));
+    }
+}
