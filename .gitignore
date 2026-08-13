@@ -12,3 +12,10 @@ build/
 **/xcuserdata/
 **/.gradle/
 **/local.properties
+
+# Compiled native libs — build output from `rsc build --android`, not source.
+# A 23MB libshowcase.so was committed before this file existed.
+**/jniLibs/
+*.so
+*.dylib
+*.a
