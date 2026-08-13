@@ -36,8 +36,12 @@ impl Component for ThemingDemo {
 
 fn main() {
     let preview = std::env::var("RSC_PREVIEW").unwrap_or_default();
+    // One design system (D133): `cupertino()` was withdrawn — it only ever
+    // restyled the accent and the app bar, which is half a platform look
+    // rather than a real one. iOS now uses the base theme; Android keeps
+    // Material's structural bar. Third-party skins plug in through this
+    // same `Themes` bundle.
     let themes = Themes::new(light_theme())
-        .platform(Platform::Ios, cupertino())
         .platform(Platform::Android, material());
 
     let mut app = App::new().title("Theming Demo").size(420, 300).themes(themes);

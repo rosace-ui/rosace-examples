@@ -84,7 +84,7 @@ fn sidebar() -> impl Widget {
         )
         .widget(
             Container::new().padding(EdgeInsets::only(4.0, 8.0, 8.0, 14.0)).child(Row::new().spacing(6.0)
-                    .child(Chip::new("urgent").color(Color::rgb(50, 15, 15)).selected_color(Color::rgb(80, 24, 24)))
+                    .child(Chip::new("urgent").color(Color::rgb(80, 24, 24)).selected())
                     .child(Chip::new("writing"))
             )
         )

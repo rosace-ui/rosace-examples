@@ -340,9 +340,11 @@ impl Component for Gallery {
                 DatePicker::new(viewed_month.get())
                     .selected(selected_date.get())
                     .today(SimpleDate::new(2026, 7, 17))
-                    .on_change({
+                    .on_select({
                         let s = selected_date.clone();
-                        move |d| s.set(d)
+                        // `on_select` reports (start, optional range end);
+                        // this gallery is single-date, so the end is unused.
+                        move |d, _end| s.set(d)
                     })
                     .on_month_change({
                         let m = viewed_month.clone();
