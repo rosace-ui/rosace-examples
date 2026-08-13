@@ -62,6 +62,7 @@ mod pull_to_refresh;
 mod responsive;
 mod semantics;
 mod stack;
+mod will_pop_scope;
 
 use rosace::prelude::*;
 
@@ -84,7 +85,11 @@ pub fn widget_list_screen(nav: &ScreenNav<Screen>) -> impl Widget {
 /// Beyond this a single column of examples stops being readable.
 const MAX_CONTENT_WIDTH: f32 = 720.0;
 
-pub fn widget_detail_screen(kind: WidgetKind, demo: &WidgetDemoState) -> BoxedWidget {
+pub fn widget_detail_screen(
+    kind: WidgetKind,
+    demo: &WidgetDemoState,
+    nav: &ScreenNav<Screen>,
+) -> BoxedWidget {
     let fb = crate::feedback::Feedback::new(
         demo.feedback_open.clone(),
         demo.feedback_message.clone(),
@@ -101,9 +106,9 @@ pub fn widget_detail_screen(kind: WidgetKind, demo: &WidgetDemoState) -> BoxedWi
     // so a build-once-and-hand-over version would yield the real page on the
     // layout pass and an empty one on the paint pass. `WidgetDemoState` is
     // all `Atom`s, so cloning it is cheap and shares the same state.
-    let (demo, fb2) = (demo.clone(), fb.clone());
+    let (demo, fb2, nav2) = (demo.clone(), fb.clone(), nav.clone());
     let page = Responsive::new(move |space| {
-        let body = widget_detail_body(kind, &demo, &fb2);
+        let body = widget_detail_body(kind, &demo, &fb2, &nav2);
         if space.width > MAX_CONTENT_WIDTH {
             let side = (space.width - MAX_CONTENT_WIDTH) / 2.0;
             Box::new(
@@ -124,6 +129,7 @@ fn widget_detail_body(
     kind: WidgetKind,
     demo: &WidgetDemoState,
     fb: &crate::feedback::Feedback,
+    nav: &ScreenNav<Screen>,
 ) -> BoxedWidget {
     match kind {
         WidgetKind::Checkbox => Box::new(checkbox::checkbox_detail(&demo.checkbox)),
@@ -203,5 +209,8 @@ fn widget_detail_body(
         WidgetKind::Stack => Box::new(stack::stack_detail(fb)),
         WidgetKind::Semantics => Box::new(semantics::semantics_detail(fb)),
         WidgetKind::Responsive => Box::new(responsive::responsive_detail()),
+        WidgetKind::WillPopScope => Box::new(will_pop_scope::will_pop_scope_detail(
+            &demo.will_pop_draft, &demo.will_pop_saved, &demo.will_pop_confirm, nav, fb,
+        )),
     }
 }

@@ -102,7 +102,10 @@ mod catalog_tests {
     impl Component for Page {
         fn build(&self, ctx: &mut Context) -> Element {
             let demo = WidgetDemoState::new(ctx);
-            crate::screens::widgets::widget_detail_screen(self.0, &demo).into_element()
+            // A real navigator: the WillPopScope page pops through it, and
+            // ScreenNav registers the back handler on construction.
+            let nav = rosace::nav::ScreenNav::new(ctx, crate::app::Screen::Widgets);
+            crate::screens::widgets::widget_detail_screen(self.0, &demo, &nav).into_element()
         }
     }
 
@@ -152,4 +155,70 @@ mod catalog_tests {
         }
         assert!(silent.is_empty(), "catalog pages with no semantics:\n{}", silent.join("\n"));
     }
+
+    /// The WillPopScope demo must actually GUARD, not just render.
+    ///
+    /// A catalog page that paints is not necessarily wired — this one's
+    /// whole point is the guard, and forgetting `.on_will_pop` would still
+    /// look perfect on screen. So this drives the real thing: dirty the
+    /// draft, attempt the pop every exit route goes through, and assert it
+    /// was refused and the confirmation opened.
+    #[test]
+    fn the_will_pop_scope_demo_blocks_leaving_with_unsaved_work() {
+        use rosace::nav::ScreenNav;
+        use std::sync::{Arc, Mutex};
+
+        struct Page {
+            draft: Arc<Mutex<Option<Atom<String>>>>,
+            confirm: Arc<Mutex<Option<Atom<bool>>>>,
+            nav: Arc<Mutex<Option<ScreenNav<crate::app::Screen>>>>,
+        }
+        impl Component for Page {
+            fn build(&self, ctx: &mut Context) -> Element {
+                let demo = WidgetDemoState::new(ctx);
+                let nav = ScreenNav::new(ctx, crate::app::Screen::Widgets);
+                // Somewhere to pop back to, seeded once.
+                let seeded = ctx.state(false);
+                if !seeded.get() {
+                    seeded.set(true);
+                    nav.push(crate::app::Screen::WidgetDetail(WidgetKind::WillPopScope));
+                }
+                *self.draft.lock().unwrap() = Some(demo.will_pop_draft.clone());
+                *self.confirm.lock().unwrap() = Some(demo.will_pop_confirm.clone());
+                *self.nav.lock().unwrap() = Some(nav.clone());
+                crate::screens::widgets::widget_detail_screen(
+                    WidgetKind::WillPopScope, &demo, &nav,
+                ).into_element()
+            }
+        }
+
+        let (draft, confirm, nav_out) = (
+            Arc::new(Mutex::new(None)), Arc::new(Mutex::new(None)), Arc::new(Mutex::new(None)),
+        );
+        let mut e = FrameEngine::new(
+            Box::new(Page { draft: draft.clone(), confirm: confirm.clone(), nav: nav_out.clone() }),
+            FontCache::embedded(),
+        );
+        let (mut c, mut o) = (SkiaCanvas::new(420, 800), SkiaCanvas::new(420, 800));
+        e.paint(&mut c, &mut o, &[]);
+
+        let draft = draft.lock().unwrap().clone().unwrap();
+        let confirm = confirm.lock().unwrap().clone().unwrap();
+        let nav = nav_out.lock().unwrap().clone().unwrap();
+        assert_eq!(nav.depth(), 2, "the demo page is pushed");
+
+        // Clean: leaving is allowed.
+        assert!(nav.can_pop());
+        assert!(!confirm.get(), "no question asked yet");
+
+        // Dirty it, repaint so the guard re-registers with the new state.
+        draft.set("unsaved words".into());
+        e.paint(&mut c, &mut o, &[]);
+
+        assert!(!nav.pop(), "the guard must refuse the pop");
+        e.paint(&mut c, &mut o, &[]);
+        assert!(confirm.get(), "the guard must open the confirmation");
+        assert_eq!(nav.depth(), 2, "still on the demo page");
+    }
+
 }

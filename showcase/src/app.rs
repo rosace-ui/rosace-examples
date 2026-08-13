@@ -68,6 +68,7 @@ pub enum WidgetKind {
     Hero,
     ShaderPaint,
     CustomPaint,
+    WillPopScope,
     ListView,
     Autocomplete,
     Dismissible,
@@ -126,6 +127,7 @@ impl WidgetKind {
             WidgetKind::Hero => "Hero",
             WidgetKind::ShaderPaint => "Shader Paint",
             WidgetKind::CustomPaint => "Custom Paint",
+            WidgetKind::WillPopScope => "Will Pop Scope",
             WidgetKind::ListView => "List View",
             WidgetKind::Autocomplete => "Autocomplete",
             WidgetKind::Dismissible => "Dismissible",
@@ -186,6 +188,7 @@ impl WidgetKind {
             WidgetKind::Hero => "Shared-element tagging for cross-screen transitions",
             WidgetKind::ShaderPaint => "Fills its rect with a registered custom shader material",
             WidgetKind::CustomPaint => "A leaf widget that draws with a closure",
+            WidgetKind::WillPopScope => "Confirm before leaving a screen with unsaved work",
             WidgetKind::ListView => "A virtualized list — only the visible rows are ever built",
             WidgetKind::Autocomplete => "A text field that filters a list into an overlay as you type",
             WidgetKind::Dismissible => "Swipe a row away, with a background revealed underneath",
@@ -245,6 +248,7 @@ impl WidgetKind {
         WidgetKind::Hero,
         WidgetKind::ShaderPaint,
         WidgetKind::CustomPaint,
+        WidgetKind::WillPopScope,
         WidgetKind::ListView,
         WidgetKind::Autocomplete,
         WidgetKind::Dismissible,
@@ -272,6 +276,9 @@ pub struct WidgetDemoState {
     /// visible at once.
     pub feedback_open: Atom<bool>,
     pub feedback_message: Atom<String>,
+    pub will_pop_draft: Atom<String>,
+    pub will_pop_saved: Atom<String>,
+    pub will_pop_confirm: Atom<bool>,
     pub autocomplete_value: Atom<String>,
     pub autocomplete_open: Atom<bool>,
     pub autocomplete_limited_value: Atom<String>,
@@ -355,6 +362,9 @@ impl WidgetDemoState {
         Self {
             feedback_open: ctx.state(false),
             feedback_message: ctx.state(String::new()),
+            will_pop_draft: ctx.state(String::new()),
+            will_pop_saved: ctx.state(String::new()),
+            will_pop_confirm: ctx.state(false),
             autocomplete_value: ctx.state(String::new()),
             autocomplete_open: ctx.state(false),
             autocomplete_limited_value: ctx.state(String::new()),
@@ -483,7 +493,7 @@ impl Component for AppRoot {
                     Screen::Welcome => Box::new(welcome_screen(&welcome_progress, &welcome_ctrl, &nav)),
                     Screen::Home => Box::new(home_screen(&nav)),
                     Screen::Widgets => Box::new(widget_list_screen(&nav)),
-                    Screen::WidgetDetail(kind) => widget_detail_screen(kind, &widget_demo),
+                    Screen::WidgetDetail(kind) => widget_detail_screen(kind, &widget_demo, &nav),
                     Screen::PlatformChannel => {
                         Box::new(platform_channel_screen(&device_info_call, camera_permission))
                     }
