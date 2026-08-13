@@ -1,0 +1,10 @@
+# ROSACE app manifest — read by `rsc run` / `rsc build`.
+name = "widget_gallery"
+bundle_id = "dev.rosace.gallery"
+platforms = ["macos", "ios"]
+
+# Bundled assets (images, fonts, data). Directories are scanned recursively;
+# reference files in code via the generated typed handles, e.g.
+# `Image::asset(assets::LOGO)`. Editing an asset hot-reloads under `rsc dev`.
+[assets]
+dirs = ["assets"]

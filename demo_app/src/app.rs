@@ -9,7 +9,7 @@ use crate::screens::{
 };
 
 /// Every screen in the app. Add a variant + a match arm to add a route.
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Hash)]
 pub enum Screen {
     Home,
     Counter,
@@ -106,7 +106,9 @@ impl Component for AppRoot {
         let screen = nav.current().unwrap_or(Screen::Home);
         let body = build_screen(screen);
         let outgoing = nav.previous().map(build_screen);
-        let view = ScreenTransitionView::new(body, outgoing, nav.transition_handle());
+        let view = ScreenTransitionView::new(
+            body, nav.current_key(), outgoing, nav.previous_key(), nav.transition_handle(), nav.stack_keys(),
+        );
 
         // App bar: a back button appears off Home; a theme toggle on the right.
         let mut bar = AppBar::new(screen.title()).back_button(&nav);

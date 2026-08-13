@@ -1,0 +1,14 @@
+# Build output — every app here carries its own target/
+target/
+**/target/
+dist/
+build/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Xcode / Gradle local state
+**/xcuserdata/
+**/.gradle/
+**/local.properties

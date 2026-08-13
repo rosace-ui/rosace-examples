@@ -189,7 +189,7 @@ impl Component for Gallery {
                     ),
             )
             // ── Structure ──────────────────────────────────────────
-            .child(section("Card, Container, Grid, Expander, Dropdown"))
+            .child(section("Card, Container, Grid, Accordion, Dropdown"))
             .child(
                 Row::new()
                     .spacing(12.0)
@@ -220,8 +220,8 @@ impl Component for Gallery {
                         .collect(),
                 ),
             )
-            .child(Expander::new(
-                "Expander — click to toggle",
+            .child(Accordion::new(
+                "Accordion — click to toggle",
                 expanded.clone(),
                 Text::new("expanded body content"),
             ))

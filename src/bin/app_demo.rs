@@ -414,8 +414,8 @@ fn showcase_screen(radio_sel: &Atom<usize>, seg_sel: &Atom<usize>, drop_open: &A
             .on_change({let s=ss.clone(); move|i| s.set(i)}))
         .child(Dropdown::new(vec!["Rust","Swift","Kotlin","Dart"], ds.get(), drop_open.clone())
             .on_change({let d=ds.clone(); move|i| d.set(i)}))
-        .child(Text::heading("Expander"))
-        .child(Expander::new("Show details", exp_open.clone(),
+        .child(Text::heading("Accordion"))
+        .child(Accordion::new("Show details", exp_open.clone(),
             Text::caption("Collapsible body content revealed while expanded. Tap the header row to toggle.")))
 }
 

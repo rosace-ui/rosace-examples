@@ -1,9 +1,11 @@
+[workspace]
+
 [package]
 name = "rosace-examples"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
+version = "0.1.0"
+edition = "2021"
+authors = ["ROSACE Contributors"]
+license = "MIT OR Apache-2.0"
 
 [[bin]]
 name = "counter"

@@ -11,14 +11,22 @@ pub fn home_screen(nav: &ScreenNav<Screen>) -> impl Widget {
         .children(vec![
             Box::new(ListTile::new("Counter")
                 .subtitle("A simple counter with + / \u{2212}")
-                .on_press(move || {
-                    nav.push(Screen::Counter);
+                .on_press({
+                    let nav = nav.clone();
+                    move || { nav.push(Screen::Counter); }
                 })
             ),
-            Box::new(ListTile::new("Counter")
-                .subtitle("A simple counter with + / \u{2212}")
+            Box::new(ListTile::new("Calendar")
+                .subtitle("DatePicker — month-slide animation")
+                .on_press({
+                    let nav = nav.clone();
+                    move || { nav.push(Screen::Calendar); }
+                })
+            ),
+            Box::new(ListTile::new("Timer")
+                .subtitle("TimePicker — clock-dial hand")
                 .on_press(move || {
-                    nav.push(Screen::Counter);
+                    nav.push(Screen::Timer);
                 })
             )])
 }
