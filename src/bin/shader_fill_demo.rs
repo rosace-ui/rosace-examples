@@ -41,7 +41,7 @@ fn split_pipeline() -> PipelineId {
 struct ShaderFillDemo;
 
 impl Component for ShaderFillDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             Column::new()
                 .child(Spacer::gap(0.0, 40.0))
@@ -63,7 +63,7 @@ impl Component for ShaderFillDemo {
                 ),
         )
         .app_bar(AppBar::new("shader_fill_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

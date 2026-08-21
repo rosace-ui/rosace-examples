@@ -5,7 +5,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -24,15 +24,15 @@ pub fn table_detail() -> impl Widget {
                 "Auto columns",
                 Table::new()
                     .columns(vec![TableColumn::auto(), TableColumn::auto()])
-                    .row(vec![Box::new(Text::new("Name")), Box::new(Text::new("Ada"))])
-                    .row(vec![Box::new(Text::new("Role")), Box::new(Text::new("Engineer"))]),
+                    .row(vec![std::sync::Arc::new(Text::new("Name")), std::sync::Arc::new(Text::new("Ada"))])
+                    .row(vec![std::sync::Arc::new(Text::new("Role")), std::sync::Arc::new(Text::new("Engineer"))]),
             ))
             .child(labeled(
                 "Fixed + flex columns",
                 Table::new()
                     .columns(vec![TableColumn::fixed(60.0), TableColumn::flex(1.0)])
-                    .row(vec![Box::new(Text::new("Id")), Box::new(Text::new("1"))])
-                    .row(vec![Box::new(Text::new("Note")), Box::new(Text::new("A longer flexible cell"))]),
+                    .row(vec![std::sync::Arc::new(Text::new("Id")), std::sync::Arc::new(Text::new("1"))])
+                    .row(vec![std::sync::Arc::new(Text::new("Note")), std::sync::Arc::new(Text::new("A longer flexible cell"))]),
             ))
             .child(labeled(
                 "Custom spacing + cell padding + row striping + divider",
@@ -43,9 +43,9 @@ pub fn table_detail() -> impl Widget {
                     .row_background(Color::rgb(245, 245, 248))
                     .divider(1.0)
                     .divider_color(Color::rgb(220, 220, 225))
-                    .row(vec![Box::new(Text::new("A")), Box::new(Text::new("1"))])
-                    .row(vec![Box::new(Text::new("B")), Box::new(Text::new("2"))])
-                    .row(vec![Box::new(Text::new("C")), Box::new(Text::new("3"))]),
+                    .row(vec![std::sync::Arc::new(Text::new("A")), std::sync::Arc::new(Text::new("1"))])
+                    .row(vec![std::sync::Arc::new(Text::new("B")), std::sync::Arc::new(Text::new("2"))])
+                    .row(vec![std::sync::Arc::new(Text::new("C")), std::sync::Arc::new(Text::new("3"))]),
             )),
     )
 }

@@ -7,7 +7,7 @@ use rosace::prelude::*;
 struct EmojiDemo;
 
 impl Component for EmojiDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             Column::new()
                 .padding(EdgeInsets::all(24.0))
@@ -17,7 +17,7 @@ impl Component for EmojiDemo {
                 .child(Text::new("Plain text only, no emoji here").size(16.0)),
         )
         .app_bar(AppBar::new("emoji_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

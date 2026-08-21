@@ -4,7 +4,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -14,7 +14,7 @@ fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
 }
 
 fn pill(label: &str) -> BoxedWidget {
-    Box::new(Chip::new(label))
+    std::sync::Arc::new(Chip::new(label))
 }
 
 pub fn wrap_detail() -> impl Widget {

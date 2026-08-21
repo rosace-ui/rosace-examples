@@ -6,7 +6,7 @@ use rosace::prelude::*;
 use crate::feedback::Feedback;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -37,7 +37,7 @@ pub fn menu_detail(open: &Atom<bool>, styled_open: &Atom<bool>, fb: &Feedback) -
                             move || {
                                 let (o1, f1) = (o.clone(), fb.clone());
                                 let (o2, f2) = (o.clone(), fb.clone());
-                                Box::new(
+                                std::sync::Arc::new(
                                     Menu::new()
                                         .item("New", move || { o1.set(false); f1.say("New"); })
                                         .item("Open", move || { o2.set(false); f2.say("Open"); }),
@@ -57,7 +57,7 @@ pub fn menu_detail(open: &Atom<bool>, styled_open: &Atom<bool>, fb: &Feedback) -
                     Button::new("Options")
                         .on_press(move || o.set(!o.get()))
                         .dropdown(styled_open.clone(), move || {
-                            Box::new(
+                            std::sync::Arc::new(
                                 Menu::new()
                                     .min_width(220.0)
                                     .row_height(40.0)

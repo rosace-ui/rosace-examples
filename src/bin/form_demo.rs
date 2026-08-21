@@ -8,7 +8,7 @@ use rosace::prelude::*;
 struct FormDemo;
 
 impl Component for FormDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let name = FormField::for_ctx(ctx, "name").rule(Required).rule(MinLength(2));
         let email = FormField::for_ctx(ctx, "email").rule(Required).rule(Email);
         let phone = FormField::for_ctx(ctx, "phone").rule(MinLength(7));
@@ -47,7 +47,7 @@ impl Component for FormDemo {
                 .child(Text::new(if submitted.get() { "Submitted!" } else { "" }).align(TextAlign::Center)),
         )
         .app_bar(AppBar::new("form_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

@@ -7,6 +7,7 @@
 //! Output: app_showcase.png (1400×900)
 
 use rosace::prelude::*;
+use std::sync::Arc;
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 const BG:         Color = Color::rgb(15, 16, 28);
@@ -127,7 +128,7 @@ fn task_row(title: &str, done: bool, tags: &[(&str, Color, Color)], selected: bo
                                         Row::new().spacing(6.0)
                                             .children(
                                                 tags.iter().map(|(label, fg, bg)| -> rosace::BoxedWidget {
-                                                    Box::new(
+                                                    Arc::new(
                                                         Badge::label(*label)
                                                             .color(*bg)
                                                             .text_color(*fg)

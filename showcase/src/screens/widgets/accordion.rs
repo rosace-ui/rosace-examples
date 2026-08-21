@@ -4,7 +4,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -21,11 +21,11 @@ pub fn accordion_detail(expanded: &Atom<bool>, styled: &Atom<bool>) -> impl Widg
             .cross_axis_alignment(CrossAxisAlignment::Start)
             .child(labeled(
                 "Try it — tap the header",
-                Accordion::new("Section title", expanded.clone(), Text::new("The body content, revealed and animated.")),
+                Accordion::new("Section title", expanded.get(), Text::new("The body content, revealed and animated.")),
             ))
             .child(labeled(
                 "Custom background, border, radius, elevation, title size",
-                Accordion::new("Styled section", styled.clone(), Text::new("Styled body content."))
+                Accordion::new("Styled section", styled.get(), Text::new("Styled body content."))
                     .background(Color::rgb(30, 30, 40))
                     .border(Color::rgb(90, 90, 100), 1.0)
                     .radius(16.0)

@@ -4,7 +4,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -14,7 +14,7 @@ fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
 }
 
 fn page(label: &str, color: Color) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Container::new()
             .background(color)
             .radius(12.0)
@@ -27,7 +27,7 @@ fn page(label: &str, color: Color) -> BoxedWidget {
 }
 
 pub fn carousel_detail(page_index: &Atom<usize>) -> impl Widget {
-    let p = page_index.clone();
+    let set_page = page_index.clone();
     ScrollView::new(
         Column::new()
             .padding(EdgeInsets::all(16.0))
@@ -36,7 +36,8 @@ pub fn carousel_detail(page_index: &Atom<usize>) -> impl Widget {
             .child(labeled(
                 &format!("Try it — swipe, page {}", page_index.get() + 1),
                 Carousel::new()
-                    .page(p)
+                    .page(page_index.get())
+                    .on_page_change(move |i| set_page.set(i))
                     .child(page("Page 1", Color::rgb(220, 80, 60)))
                     .child(page("Page 2", Color::rgb(80, 130, 220)))
                     .child(page("Page 3", Color::rgb(80, 180, 120))),

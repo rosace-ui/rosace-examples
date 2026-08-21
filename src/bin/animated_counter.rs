@@ -4,7 +4,7 @@ use rosace::animate::use_spring;
 struct AnimatedCounter;
 
 impl Component for AnimatedCounter {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let count = ctx.state(0i32);
 
         // Spring-animated display value — chases the integer count each frame.
@@ -64,7 +64,7 @@ impl Component for AnimatedCounter {
                 ),
         )
         .app_bar(AppBar::new("Animated Counter"))
-        .into_element()
+        .boxed()
     }
 }
 

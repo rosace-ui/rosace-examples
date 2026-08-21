@@ -9,7 +9,7 @@ use rosace::prelude::*;
 struct NetStatusDemo;
 
 impl Component for NetStatusDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let status = rosace::net::use_network_status(ctx);
 
         let (label, detail) = match status {
@@ -29,7 +29,7 @@ impl Component for NetStatusDemo {
                 .child(Text::new("Toggle Wi-Fi to watch it react.").align(TextAlign::Center)),
         )
         .app_bar(AppBar::new("Network Status"))
-        .into_element()
+        .boxed()
     }
 }
 

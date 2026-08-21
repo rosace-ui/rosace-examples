@@ -9,7 +9,7 @@ use rosace::prelude::*;
 struct TextAreaDemo;
 
 impl Component for TextAreaDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let body: Atom<String> = ctx.state(String::from(
             "Type a long paragraph here and watch it wrap.\n\nPress Enter for a new line, and try Up/Down to move across wrapped lines."
         ));
@@ -32,7 +32,7 @@ impl Component for TextAreaDemo {
                 ),
         )
         .app_bar(AppBar::new("text_area_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

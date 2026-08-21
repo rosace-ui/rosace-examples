@@ -150,7 +150,7 @@ fn liquid_glass() -> ShaderMaterial {
 struct LiquidGlassApp;
 
 impl Component for LiquidGlassApp {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let name: Atom<String> = ctx.state(String::from("Select some of this text"));
         let scene: Atom<usize> = ctx.state(0usize);
         let scene_open: Atom<bool> = ctx.state(false);
@@ -172,7 +172,7 @@ impl Component for LiquidGlassApp {
                     }),
             )
             .child(
-                Dropdown::new(vec!["Aurora", "Plasma", "Nebula"], scene.get(), scene_open)
+                Dropdown::new(vec!["Aurora", "Plasma", "Nebula"], scene.get(), scene_open.get())
                     .width(300.0)
                     .background(Color::rgba(255, 255, 255, 26))
                     .on_change({
@@ -227,7 +227,7 @@ impl Component for LiquidGlassApp {
                     .left(60.0),
                 ),
         )
-        .into_element()
+        .boxed()
     }
 }
 

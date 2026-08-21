@@ -68,7 +68,7 @@ impl Feedback {
     pub fn attach(&self, child: impl Widget + 'static) -> impl Widget {
         let message = self.message.clone();
         child.toast(self.open.clone(), move || {
-            Box::new(Toast::info(message.get()))
+            std::sync::Arc::new(Toast::info(message.get()))
         })
     }
 }

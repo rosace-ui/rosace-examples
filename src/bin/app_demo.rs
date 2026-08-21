@@ -8,6 +8,7 @@
 use rosace::prelude::*;
 use rosace::theme::{set_theme, set_animations};
 use rosace_state::Atom;
+use std::sync::Arc;
 
 #[derive(Clone, Copy, PartialEq)]
 enum Screen {
@@ -55,7 +56,7 @@ fn initial_screen() -> Screen {
 }
 
 impl Component for AppDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         // Hooks — unconditional, stable order.
         let nav = ScreenNav::new(ctx, initial_screen());
         let page_ctrl = ScrollController::for_ctx(ctx);
@@ -78,18 +79,18 @@ impl Component for AppDemo {
         let screen = nav.current().unwrap_or(Screen::Home);
 
         let body: BoxedWidget = match screen {
-            Screen::Home        => Box::new(home_screen(&nav)),
-            Screen::Typography  => Box::new(ScrollView::new(typography_screen())),
-            Screen::Scrolling   => Box::new(ScrollView::controlled(
+            Screen::Home        => Arc::new(home_screen(&nav)),
+            Screen::Typography  => Arc::new(ScrollView::new(typography_screen())),
+            Screen::Scrolling   => Arc::new(ScrollView::controlled(
                 scrolling_screen(), page_ctrl.clone(),
             )),
-            Screen::Overlays    => Box::new(ScrollView::new(overlays_screen(
+            Screen::Overlays    => Arc::new(ScrollView::new(overlays_screen(
                 &dialog_open, &menu_open, &sheet_open, &toast_open,
             ))),
-            Screen::VirtualList => Box::new(virtual_list_screen()),
-            Screen::Gallery     => Box::new(ScrollView::new(gallery_screen(&check_on, &switch_on, &slider_v, &press_count))),
-            Screen::Showcase    => Box::new(ScrollView::new(showcase_screen(&radio_sel, &seg_sel, &drop_open, &drop_sel, &exp_open, &anim_on))),
-            Screen::GpuLayer    => Box::new(gpu_layer_screen()),
+            Screen::VirtualList => Arc::new(virtual_list_screen()),
+            Screen::Gallery     => Arc::new(ScrollView::new(gallery_screen(&check_on, &switch_on, &slider_v, &press_count))),
+            Screen::Showcase    => Arc::new(ScrollView::new(showcase_screen(&radio_sel, &seg_sel, &drop_open, &drop_sel, &exp_open, &anim_on))),
+            Screen::GpuLayer    => Arc::new(gpu_layer_screen()),
         };
 
         // ── AppBar: back appears off-Home; ⬆ Top only where it acts ──────
@@ -108,7 +109,7 @@ impl Component for AppDemo {
             set_theme(if dark { dark_theme() } else { light_theme() });
         }));
 
-        Scaffold::new(body).app_bar(bar).into_element()
+        Scaffold::new(body).app_bar(bar).boxed()
     }
 }
 
@@ -206,7 +207,7 @@ fn scrolling_screen() -> impl Widget {
         ))
         .child(Text::heading("Tall content to scroll"))
         .children((1..=12).map(|i| {
-            Box::new(
+            Arc::new(
                 Card::new(Text::label(format!("Section {i} — keep scrolling")))
                     .radius(10.0).elevation(3.0),
             ) as BoxedWidget
@@ -247,7 +248,7 @@ fn overlays_screen(
                             let cancel = d_cancel.clone();
                             let confirm = d_confirm.clone();
                             let toast = d_toast.clone();
-                            Box::new(
+                            Arc::new(
                                 Dialog::new("Delete item?")
                                     .message("This action cannot be undone.")
                                     .action("Cancel", move || cancel.set(false))
@@ -265,7 +266,7 @@ fn overlays_screen(
                         .dropdown(menu_open.clone(), move || {
                             let a = m_a.clone();
                             let b = m_b.clone();
-                            Box::new(
+                            Arc::new(
                                 Menu::new()
                                     .item("First action", move || a.set(false))
                                     .item("Second action", move || b.set(false)),
@@ -277,7 +278,7 @@ fn overlays_screen(
                         .variant(ButtonVariant::Ghost)
                         .on_press(move || s_open.set(true))
                         .sheet(sheet_open.clone(), || {
-                            Box::new(Sheet::new(
+                            Arc::new(Sheet::new(
                                 Column::new().spacing(8.0)
                                     .child(Text::title("Sheet title"))
                                     .child(Text::caption("Tap the scrim or press Escape to dismiss.")),
@@ -289,7 +290,7 @@ fn overlays_screen(
                         .variant(ButtonVariant::Success)
                         .on_press(move || Toast::show(&t_open, 2.5))
                         .toast(toast_open.clone(), || {
-                            Box::new(Toast::success("Action completed"))
+                            Arc::new(Toast::success("Action completed"))
                         }),
                 ),
         )
@@ -305,7 +306,7 @@ fn virtual_list_screen() -> impl Widget {
         ))
         .child(Container::new().height(430.0).child(
             ListView::builder(10_000, 40.0, |i| {
-                Box::new(
+                Arc::new(
                     Container::new()
                         .padding(EdgeInsets::symmetric(12.0, 10.0))
                         .child(Text::label(format!("Row {i} — built on demand"))),
@@ -384,13 +385,13 @@ fn showcase_screen(radio_sel: &Atom<usize>, seg_sel: &Atom<usize>, drop_open: &A
                 .border(Color::WHITE, 2.0).clip()))
         .child(Text::heading("Grid & Wrap"))
         .child(Grid::new(4).spacing(8.0).run_spacing(8.0)
-            .children((0..8).map(|i| Box::new(
+            .children((0..8).map(|i| Arc::new(
                 Container::new().height(40.0).radius(8.0)
                     .background(Color::rgb(50 + i*20, 60, 110)).align(Alignment::Center)
                     .child(Text::caption(format!("{}", i+1)))) as BoxedWidget).collect()))
         .child(Wrap::new().spacing(8.0).run_spacing(8.0)
             .children(["design","rust","ui","fast","native","reactive","themeable"].iter()
-                .map(|t| Box::new(Chip::new(*t)) as BoxedWidget).collect()))
+                .map(|t| Arc::new(Chip::new(*t)) as BoxedWidget).collect()))
         .child(Text::heading("Progress & Skeleton"))
         .child(Wrap::new().spacing(20.0).run_spacing(12.0)
             .child(CircularProgress::new(0.65))
@@ -412,11 +413,13 @@ fn showcase_screen(radio_sel: &Atom<usize>, seg_sel: &Atom<usize>, drop_open: &A
             .child(Text::label("Three")))
         .child(SegmentedControl::new(vec!["Day","Week","Month"], ss.get())
             .on_change({let s=ss.clone(); move|i| s.set(i)}))
-        .child(Dropdown::new(vec!["Rust","Swift","Kotlin","Dart"], ds.get(), drop_open.clone())
-            .on_change({let d=ds.clone(); move|i| d.set(i)}))
+        .child(Dropdown::new(vec!["Rust","Swift","Kotlin","Dart"], ds.get(), drop_open.get())
+            .on_change({let d=ds.clone(); move|i| d.set(i)})
+            .on_open_change({let o=drop_open.clone(); move|open| o.set(open)}))
         .child(Text::heading("Accordion"))
-        .child(Accordion::new("Show details", exp_open.clone(),
-            Text::caption("Collapsible body content revealed while expanded. Tap the header row to toggle.")))
+        .child(Accordion::new("Show details", exp_open.get(),
+            Text::caption("Collapsible body content revealed while expanded. Tap the header row to toggle."))
+            .on_change({let e=exp_open.clone(); move|open| e.set(open)}))
 }
 
 // ── Shared bits ───────────────────────────────────────────────────────────────

@@ -5,7 +5,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -57,7 +57,7 @@ pub fn dialog_detail(
                     .on_press(move || modal_trigger.set(true))
                     .dialog(modal_open.clone(), move || {
                         let o = modal_trigger2.clone();
-                        Box::new(
+                        std::sync::Arc::new(
                             Dialog::new("Delete item?")
                                 .message("This cannot be undone.")
                                 .action("Cancel", { let o = o.clone(); move || o.set(false) })
@@ -79,7 +79,7 @@ pub fn dialog_detail(
                     .on_press(move || styled_trigger.set(true))
                     .dialog(styled_open.clone(), {
                         let o = styled_open.clone();
-                        move || Box::new(
+                        move || std::sync::Arc::new(
                             Dialog::new("Styled")
                                 .width(280.0)
                                 .radius(20.0)

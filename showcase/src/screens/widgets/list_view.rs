@@ -10,7 +10,7 @@ use rosace::prelude::*;
 use crate::feedback::Feedback;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -40,7 +40,7 @@ pub fn list_view_detail(fb: &Feedback) -> impl Widget {
                 "10,000 rows — only the visible ones exist",
                 viewport(ListView::builder(10_000, 56.0, move |i| {
                     let f = f1.clone();
-                    Box::new(
+                    std::sync::Arc::new(
                         ListTile::new(format!("Row {i}"))
                             .subtitle("Tap to confirm this row is real")
                             .on_press(move || f.say(format!("Row {i} tapped"))),
@@ -51,7 +51,7 @@ pub fn list_view_detail(fb: &Feedback) -> impl Widget {
                 "Compact rows (item_extent 36)",
                 viewport(ListView::builder(500, 36.0, move |i| {
                     let f = f2.clone();
-                    Box::new(
+                    std::sync::Arc::new(
                         ListTile::new(format!("Compact item {i}"))
                             .no_divider()
                             .on_press(move || f.say(format!("Compact item {i} tapped"))),
@@ -63,7 +63,7 @@ pub fn list_view_detail(fb: &Feedback) -> impl Widget {
                 viewport(
                     ListView::builder(200, 44.0, move |i| {
                         let f = f3.clone();
-                        Box::new(
+                        std::sync::Arc::new(
                             ListTile::new(format!("Clean row {i}"))
                                 .on_press(move || f.say(format!("Clean row {i} tapped"))),
                         )
@@ -75,7 +75,7 @@ pub fn list_view_detail(fb: &Feedback) -> impl Widget {
                 "Custom scrollbar colour",
                 viewport(
                     ListView::builder(200, 44.0, |i| {
-                        Box::new(ListTile::new(format!("Row {i}")))
+                        std::sync::Arc::new(ListTile::new(format!("Row {i}")))
                     })
                     .scrollbar_color(Color::rgb(230, 120, 60)),
                 ),

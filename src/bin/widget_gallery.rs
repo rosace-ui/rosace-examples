@@ -6,6 +6,7 @@
 
 use rosace::prelude::*;
 use rosace::render::Color;
+use std::sync::Arc;
 
 fn section(title: &str) -> impl Widget {
     Text::title(title).size(15.0)
@@ -55,7 +56,7 @@ fn tile_plane() -> impl Widget {
 struct Gallery;
 
 impl Component for Gallery {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let checked = ctx.state(true);
         let switch_on = ctx.state(true);
         let seg = ctx.state(0usize);
@@ -202,14 +203,19 @@ impl Component for Gallery {
                             .padding(EdgeInsets::all(10.0)),
                     )
                     .child(
-                        Dropdown::new(vec!["One", "Two", "Three"], 0, dd_open.clone()).width(110.0),
+                        Dropdown::new(vec!["One", "Two", "Three"], 0, dd_open.get())
+                            .width(110.0)
+                            .on_open_change({
+                                let dd_open = dd_open.clone();
+                                move |o| dd_open.set(o)
+                            }),
                     ),
             )
             .child(
                 Grid::new(4).spacing(6.0).children(
                     (0..4)
                         .map(|i| {
-                            Box::new(
+                            Arc::new(
                                 Container::new()
                                     .child(Text::new(format!("cell {i}")).size(11.0))
                                     .background(Color::rgb(24 + i as u8 * 8, 28, 52))
@@ -220,11 +226,17 @@ impl Component for Gallery {
                         .collect(),
                 ),
             )
-            .child(Accordion::new(
-                "Accordion — click to toggle",
-                expanded.clone(),
-                Text::new("expanded body content"),
-            ))
+            .child(
+                Accordion::new(
+                    "Accordion — click to toggle",
+                    expanded.get(),
+                    Text::new("expanded body content"),
+                )
+                .on_change({
+                    let expanded = expanded.clone();
+                    move |open| expanded.set(open)
+                }),
+            )
             // ── New in this sweep: Stepper, RatingBar, Table ───────
             .child(section("Stepper, RatingBar"))
             .child(
@@ -248,21 +260,21 @@ impl Component for Gallery {
                     .cell_padding(6.0)
                     .divider(1.0)
                     .row(vec![
-                        Box::new(Text::new("Name").weight(FontWeight::Bold)) as BoxedWidget,
-                        Box::new(Text::new("Description").weight(FontWeight::Bold)),
-                        Box::new(Text::new("Qty").weight(FontWeight::Bold)),
+                        Arc::new(Text::new("Name").weight(FontWeight::Bold)) as BoxedWidget,
+                        Arc::new(Text::new("Description").weight(FontWeight::Bold)),
+                        Arc::new(Text::new("Qty").weight(FontWeight::Bold)),
                     ])
                     .row(vec![
-                        Box::new(Text::new("Widget")) as BoxedWidget,
-                        Box::new(Text::new(
+                        Arc::new(Text::new("Widget")) as BoxedWidget,
+                        Arc::new(Text::new(
                             "A flexible middle column that takes leftover width",
                         )),
-                        Box::new(Text::new("42")),
+                        Arc::new(Text::new("42")),
                     ])
                     .row(vec![
-                        Box::new(Text::new("Gadget")) as BoxedWidget,
-                        Box::new(Text::new("Second zebra row")),
-                        Box::new(Text::new("7")),
+                        Arc::new(Text::new("Gadget")) as BoxedWidget,
+                        Arc::new(Text::new("Second zebra row")),
+                        Arc::new(Text::new("7")),
                     ]),
             )
             .child(section("DataTable — sortable header, selectable rows"))
@@ -295,7 +307,7 @@ impl Component for Gallery {
                 Grid::new(3).staggered().spacing(6.0).children(
                     (0..6)
                         .map(|i| {
-                            Box::new(
+                            Arc::new(
                                 Container::new()
                                     .child(Text::new(format!("item {i}")).size(11.0))
                                     .background(Color::rgb(26 + i as u8 * 6, 30, 54))
@@ -308,10 +320,17 @@ impl Component for Gallery {
             )
             .child(section("Carousel — drag horizontally, snaps to pages"))
             .child(
-                Carousel::new().height(90.0).page(page.clone()).children(
+                Carousel::new()
+                    .height(90.0)
+                    .page(page.get())
+                    .on_page_change({
+                        let page = page.clone();
+                        move |i| page.set(i)
+                    })
+                    .children(
                     (0..4)
                         .map(|i| {
-                            Box::new(
+                            Arc::new(
                                 Container::new()
                                     .child(Text::title(format!("Page {}", i + 1)))
                                     .background(Color::rgb(30 + i as u8 * 10, 34, 66))
@@ -408,7 +427,7 @@ impl Component for Gallery {
         Scaffold::new(ScrollView::new(col))
             .app_bar(AppBar::new("Widget Gallery"))
             .bottom_bar(bar)
-            .into_element()
+            .boxed()
     }
 }
 

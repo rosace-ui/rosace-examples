@@ -5,7 +5,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -15,7 +15,7 @@ fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
 }
 
 fn sheet_body(label: &str) -> BoxedWidget {
-    Box::new(Column::new().padding(EdgeInsets::all(16.0)).spacing(8.0).child(Text::new(label)))
+    std::sync::Arc::new(Column::new().padding(EdgeInsets::all(16.0)).spacing(8.0).child(Text::new(label)))
 }
 
 pub fn sheet_detail(
@@ -36,7 +36,7 @@ pub fn sheet_detail(
                     Button::new("Open sheet")
                         .on_press(move || o.set(true))
                         .sheet(default_open.clone(), || {
-                            Box::new(Sheet::new(sheet_body("Default sheet content")))
+                            std::sync::Arc::new(Sheet::new(sheet_body("Default sheet content")))
                         })
                 },
             ))
@@ -47,7 +47,7 @@ pub fn sheet_detail(
                     Button::new("Open half-height sheet")
                         .on_press(move || o.set(true))
                         .sheet(detent_open.clone(), || {
-                            Box::new(Sheet::new(sheet_body("Half the window")).detent(0.5))
+                            std::sync::Arc::new(Sheet::new(sheet_body("Half the window")).detent(0.5))
                         })
                 },
             ))
@@ -62,7 +62,7 @@ pub fn sheet_detail(
                             for i in 0..30 {
                                 col = col.child(Text::new(format!("Row {i}")));
                             }
-                            Box::new(Sheet::new(col).full_screen().scrollable())
+                            std::sync::Arc::new(Sheet::new(col).full_screen().scrollable())
                         })
                 },
             ))
@@ -73,7 +73,7 @@ pub fn sheet_detail(
                     Button::new("Open styled sheet")
                         .on_press(move || o.set(true))
                         .sheet(styled_open.clone(), || {
-                            Box::new(
+                            std::sync::Arc::new(
                                 Sheet::new(sheet_body("Styled sheet"))
                                     .no_handle()
                                     .radius(28.0)

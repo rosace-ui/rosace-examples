@@ -5,7 +5,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -15,13 +15,13 @@ fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
 }
 
 fn tile(color: Color, h: f32) -> BoxedWidget {
-    Box::new(Container::new().background(color).radius(8.0).height(h))
+    std::sync::Arc::new(Container::new().background(color).radius(8.0).height(h))
 }
 
 /// Bento cells are sized by the grid's fixed lattice, not the child — no
 /// `.height()` here so `Container` just fills whatever cell it's given.
 fn bento_tile(color: Color) -> BoxedWidget {
-    Box::new(Container::new().background(color).radius(8.0))
+    std::sync::Arc::new(Container::new().background(color).radius(8.0))
 }
 
 pub fn grid_detail() -> impl Widget {

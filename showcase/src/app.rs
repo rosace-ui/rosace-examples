@@ -462,7 +462,7 @@ impl Screen {
 pub struct AppRoot;
 
 impl Component for AppRoot {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         // Hooks — declared unconditionally, in a stable order.
         let nav = ScreenNav::new(ctx, Screen::Welcome);
         // The welcome screen's reveal animation — owned here (not inside
@@ -490,12 +490,12 @@ impl Component for AppRoot {
             let device_info_call = device_info_call.clone();
             move |s: Screen| -> BoxedWidget {
                 match s {
-                    Screen::Welcome => Box::new(welcome_screen(&welcome_progress, &welcome_ctrl, &nav)),
-                    Screen::Home => Box::new(home_screen(&nav)),
-                    Screen::Widgets => Box::new(widget_list_screen(&nav)),
+                    Screen::Welcome => std::sync::Arc::new(welcome_screen(&welcome_progress, &welcome_ctrl, &nav)),
+                    Screen::Home => std::sync::Arc::new(home_screen(&nav)),
+                    Screen::Widgets => std::sync::Arc::new(widget_list_screen(&nav)),
                     Screen::WidgetDetail(kind) => widget_detail_screen(kind, &widget_demo, &nav),
                     Screen::PlatformChannel => {
-                        Box::new(platform_channel_screen(&device_info_call, camera_permission))
+                        std::sync::Arc::new(platform_channel_screen(&device_info_call, camera_permission))
                     }
                 }
             }
@@ -511,7 +511,7 @@ impl Component for AppRoot {
         // the very first thing anyone sees). Every other screen gets the
         // normal bar with a theme toggle and (off Home) a back button.
         if matches!(screen, Screen::Welcome) {
-            return Scaffold::new(view).into_element();
+            return Scaffold::new(view).boxed();
         }
 
         let mut bar = AppBar::new(screen.title()).back_button(&nav);
@@ -535,6 +535,6 @@ impl Component for AppRoot {
                 }),
         );
 
-        Scaffold::new(view).app_bar(bar).into_element()
+        Scaffold::new(view).app_bar(bar).boxed()
     }
 }

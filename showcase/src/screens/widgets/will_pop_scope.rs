@@ -11,7 +11,7 @@ use rosace::prelude::*;
 use crate::feedback::Feedback;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -110,7 +110,7 @@ pub fn will_pop_scope_detail(
 
     WillPopScope::new(
         ScrollView::new(body).dialog(dialog_open, move || {
-            Box::new(
+            std::sync::Arc::new(
                 Dialog::new("Discard changes?")
                     .message("Your draft has not been saved. Leaving now will lose it.")
                     .action("Keep editing", keep.clone())

@@ -46,15 +46,15 @@ use crate::MATH_CHANNEL;
 /// — shared by every card below so the three demos read consistently.
 fn status_widget(state: &Option<ChannelCallState>) -> BoxedWidget {
     match state {
-        None => Box::new(Text::new("Not asked yet.").color(Color::rgb(140, 140, 140))),
+        None => std::sync::Arc::new(Text::new("Not asked yet.").color(Color::rgb(140, 140, 140))),
         Some(ChannelCallState::Pending) => {
-            Box::new(Text::new("Asking native… (waiting for a reply)").color(Color::rgb(200, 140, 0)))
+            std::sync::Arc::new(Text::new("Asking native… (waiting for a reply)").color(Color::rgb(200, 140, 0)))
         }
         Some(ChannelCallState::Resolved(value)) => {
-            Box::new(Text::new(format!("✅ {value}")).color(Color::rgb(30, 140, 60)))
+            std::sync::Arc::new(Text::new(format!("✅ {value}")).color(Color::rgb(30, 140, 60)))
         }
         Some(ChannelCallState::Failed(message)) => {
-            Box::new(Text::new(format!("❌ {message}")).color(Color::rgb(180, 40, 40)))
+            std::sync::Arc::new(Text::new(format!("❌ {message}")).color(Color::rgb(180, 40, 40)))
         }
     }
 }
@@ -72,7 +72,7 @@ fn status_widget(state: &Option<ChannelCallState>) -> BoxedWidget {
 fn device_info_card(call: &Atom<Option<Atom<ChannelCallState>>>) -> BoxedWidget {
     let current = call.get().as_ref().map(|atom| atom.get());
     let call_for_press = call.clone();
-    Box::new(
+    std::sync::Arc::new(
         Card::new(
             Column::new()
                 .spacing(8.0)
@@ -123,11 +123,11 @@ fn device_info_card(call: &Atom<Option<Atom<ChannelCallState>>>) -> BoxedWidget 
 /// state instead of reading globals themselves.
 fn camera_permission_card(permission: Option<bool>) -> BoxedWidget {
     let status: BoxedWidget = match permission {
-        None => Box::new(Text::new("Not asked yet.").color(Color::rgb(140, 140, 140))),
-        Some(true) => Box::new(Text::new("✅ Granted").color(Color::rgb(30, 140, 60))),
-        Some(false) => Box::new(Text::new("❌ Denied").color(Color::rgb(180, 40, 40))),
+        None => std::sync::Arc::new(Text::new("Not asked yet.").color(Color::rgb(140, 140, 140))),
+        Some(true) => std::sync::Arc::new(Text::new("✅ Granted").color(Color::rgb(30, 140, 60))),
+        Some(false) => std::sync::Arc::new(Text::new("❌ Denied").color(Color::rgb(180, 40, 40))),
     };
-    Box::new(
+    std::sync::Arc::new(
         Card::new(
             Column::new()
                 .spacing(8.0)
@@ -166,7 +166,7 @@ fn camera_permission_card(permission: Option<bool>) -> BoxedWidget {
 /// `lib.rs::app_init`) and got a real answer back, synchronously, in one
 /// blocking call.
 fn sync_dispatch_card() -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Card::new(
             Column::new()
                 .spacing(8.0)

@@ -9,7 +9,7 @@ use rosace::prelude::*;
 struct BottomNavDemo;
 
 impl Component for BottomNavDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let tab = ctx.state(0usize);
         let count = ctx.state(0i32);
 
@@ -45,7 +45,7 @@ impl Component for BottomNavDemo {
             .app_bar(AppBar::new("Bottom Nav + FAB"))
             .bottom_bar(bar)
             .fab(FloatingActionButton::new().on_press(move || c.set(c.get() + 1)))
-            .into_element()
+            .boxed()
     }
 }
 

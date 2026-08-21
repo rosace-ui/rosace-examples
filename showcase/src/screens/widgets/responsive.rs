@@ -4,7 +4,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -27,7 +27,7 @@ pub fn responsive_detail() -> impl Widget {
             .child(labeled(
                 "Reports the width it was given",
                 Responsive::new(|space| {
-                    Box::new(Text::new(format!("{:.0} px wide", space.width)))
+                    std::sync::Arc::new(Text::new(format!("{:.0} px wide", space.width)))
                 }),
             ))
             .child(labeled(
@@ -36,11 +36,11 @@ pub fn responsive_detail() -> impl Widget {
                     let a = swatch(Color::rgb(70, 110, 190), "A");
                     let b = swatch(Color::rgb(190, 110, 70), "B");
                     if space.width >= breakpoint::COMPACT {
-                        Box::new(Row::new().spacing(8.0)
+                        std::sync::Arc::new(Row::new().spacing(8.0)
                             .child(Expanded::new(a))
                             .child(Expanded::new(b)))
                     } else {
-                        Box::new(Column::new().spacing(8.0).child(a).child(b))
+                        std::sync::Arc::new(Column::new().spacing(8.0).child(a).child(b))
                     }
                 }),
             ))
@@ -57,7 +57,7 @@ pub fn responsive_detail() -> impl Widget {
                             &format!("{}/{}", i + 1, cols),
                         )));
                     }
-                    Box::new(Column::new().spacing(6.0)
+                    std::sync::Arc::new(Column::new().spacing(6.0)
                         .child(Text::new(format!("{cols} column(s)")))
                         .child(row))
                 }),

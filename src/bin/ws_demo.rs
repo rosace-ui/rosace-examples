@@ -14,7 +14,7 @@ const URL: &str = "wss://ws.postman-echo.com/raw";
 struct WsDemo;
 
 impl Component for WsDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let ws = rosace::ws::use_websocket(ctx, URL);
 
         // Fire a numbered message every second so the echo stream is
@@ -59,7 +59,7 @@ impl Component for WsDemo {
 
         Scaffold::new(col)
             .app_bar(AppBar::new("WebSocket Demo"))
-            .into_element()
+            .boxed()
     }
 }
 

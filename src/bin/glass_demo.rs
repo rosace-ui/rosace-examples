@@ -8,7 +8,7 @@ use rosace::prelude::*;
 struct GlassDemo;
 
 impl Component for GlassDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             CustomPaint::new(|cx, _size| {
                 let ox = cx.rect.origin.x;
@@ -56,7 +56,7 @@ impl Component for GlassDemo {
             }),
         )
         .app_bar(AppBar::new("glassmorphism — D-DEF-012"))
-        .into_element()
+        .boxed()
     }
 }
 

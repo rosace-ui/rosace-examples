@@ -15,7 +15,7 @@ use rosace::prelude::*;
 struct Counter;
 
 impl Component for Counter {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let count = ctx.state(0i32);
         Scaffold::new(
             Column::new()
@@ -37,7 +37,7 @@ impl Component for Counter {
                 ),
         )
         .app_bar(AppBar::new("Rosace on Web"))
-        .into_element()
+        .boxed()
     }
 }
 

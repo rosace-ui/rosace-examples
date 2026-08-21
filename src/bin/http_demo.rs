@@ -10,7 +10,7 @@ const URL: &str = "https://httpbin.org/json";
 struct HttpDemo;
 
 impl Component for HttpDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let query = rosace::net::use_query(ctx, URL);
 
         let (status, body) = match &query {
@@ -34,7 +34,7 @@ impl Component for HttpDemo {
 
         Scaffold::new(col)
             .app_bar(AppBar::new("HTTP Demo"))
-            .into_element()
+            .boxed()
     }
 }
 

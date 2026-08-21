@@ -76,7 +76,7 @@ fn glass_material() -> ShaderMaterial {
 struct GlassDemo;
 
 impl Component for GlassDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         let swatch = |c: Color, label: &str| {
             Container::new()
                 .background(c)
@@ -112,7 +112,7 @@ impl Component for GlassDemo {
                 ),
         )
         .app_bar(AppBar::new("glass_material_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

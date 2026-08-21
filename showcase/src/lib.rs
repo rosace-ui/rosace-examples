@@ -100,12 +100,12 @@ mod catalog_tests {
     struct Page(WidgetKind);
 
     impl Component for Page {
-        fn build(&self, ctx: &mut Context) -> Element {
+        fn build(&self, ctx: &mut Context) -> BoxedWidget {
             let demo = WidgetDemoState::new(ctx);
             // A real navigator: the WillPopScope page pops through it, and
             // ScreenNav registers the back handler on construction.
             let nav = rosace::nav::ScreenNav::new(ctx, crate::app::Screen::Widgets);
-            crate::screens::widgets::widget_detail_screen(self.0, &demo, &nav).into_element()
+            crate::screens::widgets::widget_detail_screen(self.0, &demo, &nav).boxed()
         }
     }
 
@@ -174,7 +174,7 @@ mod catalog_tests {
             nav: Arc<Mutex<Option<ScreenNav<crate::app::Screen>>>>,
         }
         impl Component for Page {
-            fn build(&self, ctx: &mut Context) -> Element {
+            fn build(&self, ctx: &mut Context) -> BoxedWidget {
                 let demo = WidgetDemoState::new(ctx);
                 let nav = ScreenNav::new(ctx, crate::app::Screen::Widgets);
                 // Somewhere to pop back to, seeded once.
@@ -188,7 +188,7 @@ mod catalog_tests {
                 *self.nav.lock().unwrap() = Some(nav.clone());
                 crate::screens::widgets::widget_detail_screen(
                     WidgetKind::WillPopScope, &demo, &nav,
-                ).into_element()
+                ).boxed()
             }
         }
 

@@ -6,7 +6,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -16,7 +16,7 @@ fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
 }
 
 fn body(label: &str) -> BoxedWidget {
-    Box::new(Container::new().align(Alignment::Center).child(Text::new(label)))
+    std::sync::Arc::new(Container::new().align(Alignment::Center).child(Text::new(label)))
 }
 
 pub fn scaffold_detail() -> impl Widget {

@@ -5,7 +5,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -18,7 +18,7 @@ fn panel(open: &Atom<bool>, label: &'static str) -> impl Fn() -> BoxedWidget + S
     let o = open.clone();
     move || {
         let o = o.clone();
-        Box::new(
+        std::sync::Arc::new(
             Column::new()
                 .padding(EdgeInsets::all(16.0))
                 .spacing(12.0)

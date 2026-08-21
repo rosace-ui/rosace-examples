@@ -2499,6 +2499,8 @@ dependencies = [
  "rosace-state",
  "rosace-trace",
  "rosace-widgets",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -11,7 +11,7 @@ use rosace::prelude::*;
 struct Demo;
 
 impl Component for Demo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let count = ctx.state(0i32);
         let display = count.clone();
 
@@ -24,7 +24,7 @@ impl Component for Demo {
             }
         })
         .app_bar(AppBar::new("Button Hot Reload"))
-        .into_element()
+        .boxed()
     }
 }
 

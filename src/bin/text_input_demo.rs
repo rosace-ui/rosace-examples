@@ -12,7 +12,7 @@ use rosace::prelude::*;
 struct TextInputDemo;
 
 impl Component for TextInputDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let name: Atom<String> = ctx.state(String::new());
         let email: Atom<String> = ctx.state(String::from("prefilled@example.com"));
 
@@ -47,7 +47,7 @@ impl Component for TextInputDemo {
                 .child(Text::new(format!("email atom = {:?}", email.get())).align(TextAlign::Center)),
         )
         .app_bar(AppBar::new("text_input_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

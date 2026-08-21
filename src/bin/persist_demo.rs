@@ -14,7 +14,7 @@ static BUMPED_THIS_RUN: AtomicBool = AtomicBool::new(false);
 struct PersistDemo;
 
 impl Component for PersistDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let launches = ctx.state_permanent("launch_count", 0i64);
         let note = ctx.state_permanent("note", String::from("(first run — no note yet)"));
 
@@ -36,7 +36,7 @@ impl Component for PersistDemo {
                 .child(Text::new(note.get())),
         )
         .app_bar(AppBar::new("Persist Demo"))
-        .into_element()
+        .boxed()
     }
 }
 

@@ -129,7 +129,7 @@ fn morph_pipeline() -> PipelineId { PipelineId::user(0x2001) }
 struct FxDemo;
 
 impl Component for FxDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             CustomPaint::new(|cx, size| {
                 // Keep the frame loop ticking; time flows in as a uniform.
@@ -168,7 +168,7 @@ impl Component for FxDemo {
             }),
         )
         .app_bar(AppBar::new("Custom shaders — liquid glass + morph"))
-        .into_element()
+        .boxed()
     }
 }
 

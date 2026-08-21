@@ -7,7 +7,7 @@ use rosace::prelude::*;
 struct ImageDemo;
 
 impl Component for ImageDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             Column::new()
                 .child(Spacer::gap(0.0, 10.0))
@@ -16,7 +16,7 @@ impl Component for ImageDemo {
                 .child(Text::new("same image, opacity path exercised by Hero elsewhere").align(TextAlign::Center)),
         )
         .app_bar(AppBar::new("image_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

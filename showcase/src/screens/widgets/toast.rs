@@ -5,7 +5,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -30,26 +30,26 @@ pub fn toast_detail(
                 "Info",
                 Button::new("Show info toast")
                     .on_press(move || Toast::show(&i, 2.5))
-                    .toast(info_open.clone(), || Box::new(Toast::info("Heads up!"))),
+                    .toast(info_open.clone(), || std::sync::Arc::new(Toast::info("Heads up!"))),
             ))
             .child(labeled(
                 "Success",
                 Button::new("Show success toast")
                     .on_press(move || Toast::show(&s, 2.5))
-                    .toast(success_open.clone(), || Box::new(Toast::success("Saved!"))),
+                    .toast(success_open.clone(), || std::sync::Arc::new(Toast::success("Saved!"))),
             ))
             .child(labeled(
                 "Error",
                 Button::new("Show error toast")
                     .on_press(move || Toast::show(&e, 2.5))
-                    .toast(error_open.clone(), || Box::new(Toast::error("Something went wrong"))),
+                    .toast(error_open.clone(), || std::sync::Arc::new(Toast::error("Something went wrong"))),
             ))
             .child(labeled(
                 "Custom background, color, accent, and radius",
                 Button::new("Show styled toast")
                     .on_press(move || Toast::show(&c, 2.5))
                     .toast(styled_open.clone(), || {
-                        Box::new(
+                        std::sync::Arc::new(
                             Toast::info("Styled")
                                 .background(Color::rgb(30, 30, 40))
                                 .color(Color::WHITE)

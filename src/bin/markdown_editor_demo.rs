@@ -12,6 +12,7 @@
 //! text-shaped widget already uses.
 
 use rosace::prelude::*;
+use std::sync::Arc;
 
 /// A deliberately toy markdown tokenizer — real enough to prove the
 /// `SpanSource` seam works, not a spec-complete markdown parser (that's
@@ -142,7 +143,7 @@ fn parse_inline_markdown(line: &str) -> RichText {
 struct MarkdownEditorDemo;
 
 impl Component for MarkdownEditorDemo {
-    fn build(&self, ctx: &mut Context) -> Element {
+    fn build(&self, ctx: &mut Context) -> BoxedWidget {
         let body: Atom<String> = ctx.state(String::from(
             "# Markdown demo\n\nType **bold** text, `inline code`, or a heading.\n\nThe toolbar wraps your selection.\n\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10\nLine 11\nLine 12\nLine 13\nLine 14\nLine 15\nLine 16\nLine 17\nLine 18\nLine 19\nLine 20"
         ));
@@ -208,7 +209,7 @@ impl Component for MarkdownEditorDemo {
                                         .children(
                                             markdown_preview_lines(&body.get())
                                                 .into_iter()
-                                                .map(|rt| Box::new(Text::rich(rt)) as BoxedWidget)
+                                                .map(|rt| Arc::new(Text::rich(rt)) as BoxedWidget)
                                                 .collect(),
                                         ),
                                 )),
@@ -216,7 +217,7 @@ impl Component for MarkdownEditorDemo {
                 ),
         )
         .app_bar(AppBar::new("markdown_editor_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

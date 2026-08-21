@@ -3,7 +3,7 @@
 use rosace::prelude::*;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -26,23 +26,23 @@ pub fn dropdown_detail(
             .cross_axis_alignment(CrossAxisAlignment::Start)
             .child(labeled(
                 &format!("Try it — selected: {}", options[selected.get().min(options.len() - 1)]),
-                Dropdown::new(options.clone(), selected.get(), open.clone())
+                Dropdown::new(options.clone(), selected.get(), open.get())
                     .on_change(move |i| s.set(i)),
             ))
             .child(labeled(
                 "Disabled",
-                Dropdown::new(vec!["Only option"], 0, open2.clone()).disabled(),
+                Dropdown::new(vec!["Only option"], 0, open2.get()).disabled(),
             ))
             .child(labeled(
                 "Custom width + radius",
-                Dropdown::new(vec!["A", "B", "C"], 0, open3.clone()).width(220.0).radius(12.0),
+                Dropdown::new(vec!["A", "B", "C"], 0, open3.get()).width(220.0).radius(12.0),
             ))
             .child(labeled(
                 &format!(
                     "Custom background, border, shape — selected: {}",
                     vec!["Alpha", "Beta", "Gamma"][styled_selected.get().min(2)]
                 ),
-                Dropdown::new(vec!["Alpha", "Beta", "Gamma"], styled_selected.get(), styled_open.clone())
+                Dropdown::new(vec!["Alpha", "Beta", "Gamma"], styled_selected.get(), styled_open.get())
                     .background(Color::rgb(30, 30, 40))
                     .color(Color::WHITE)
                     .border(Color::rgb(220, 80, 60), 1.5)

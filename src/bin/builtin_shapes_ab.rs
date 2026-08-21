@@ -13,7 +13,7 @@ const GPU_X: f32 = 330.0;
 struct ShapesAb;
 
 impl Component for ShapesAb {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             CustomPaint::new(|cx, _size| {
                 let ox = cx.rect.origin.x;
@@ -80,7 +80,7 @@ impl Component for ShapesAb {
             }),
         )
         .app_bar(AppBar::new("CPU (left) vs GPU (right)"))
-        .into_element()
+        .boxed()
     }
 }
 

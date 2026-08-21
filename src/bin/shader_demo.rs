@@ -43,7 +43,7 @@ fn plasma() -> ShaderMaterial {
 struct ShaderDemo;
 
 impl Component for ShaderDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         let tile = |label: &str, w: ShaderPaint| {
             Column::new()
                 .spacing(4.0)
@@ -96,7 +96,7 @@ impl Component for ShaderDemo {
                 ),
         ))
         .app_bar(AppBar::new("shader_demo"))
-        .into_element()
+        .boxed()
     }
 }
 

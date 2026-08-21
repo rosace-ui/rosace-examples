@@ -6,7 +6,7 @@ use rosace::prelude::*;
 use crate::feedback::Feedback;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
-    Box::new(
+    std::sync::Arc::new(
         Column::new()
             .spacing(6.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
@@ -42,7 +42,7 @@ pub fn autocomplete_detail(
             .cross_axis_alignment(CrossAxisAlignment::Start)
             .child(labeled(
                 "Type to filter — try \"an\"",
-                Autocomplete::new(countries(), open.clone())
+                Autocomplete::new(countries(), open.get())
                     .value(value.get())
                     .placeholder("Country")
                     .on_change(move |t| v1.set(t))
@@ -50,7 +50,7 @@ pub fn autocomplete_detail(
             ))
             .child(labeled(
                 "max_visible(3) — the overlay caps its height",
-                Autocomplete::new(countries(), limited_open.clone())
+                Autocomplete::new(countries(), limited_open.get())
                     .value(limited_value.get())
                     .placeholder("At most three suggestions")
                     .max_visible(3)

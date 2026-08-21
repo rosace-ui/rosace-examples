@@ -15,7 +15,7 @@ use rosace::prelude::*;
 struct ThemingDemo;
 
 impl Component for ThemingDemo {
-    fn build(&self, _ctx: &mut Context) -> Element {
+    fn build(&self, _ctx: &mut Context) -> BoxedWidget {
         Scaffold::new(
             Column::new()
                 .padding(EdgeInsets::all(24.0))
@@ -30,7 +30,7 @@ impl Component for ThemingDemo {
                 .leading(Button::new("Back").variant(ButtonVariant::Ghost).width(70.0))
                 .action(Button::new("Edit").variant(ButtonVariant::Ghost).width(60.0)),
         )
-        .into_element()
+        .boxed()
     }
 }
 
