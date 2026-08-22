@@ -196,7 +196,7 @@ fn widget_detail_body(
         WidgetKind::BottomNav => std::sync::Arc::new(bottom_nav::bottom_nav_detail(&demo.bottom_nav_selected)),
         WidgetKind::AppBar => std::sync::Arc::new(app_bar::app_bar_detail()),
         WidgetKind::Hero => std::sync::Arc::new(hero::hero_detail()),
-        WidgetKind::ListView => std::sync::Arc::new(list_view::list_view_detail(fb)),
+        WidgetKind::ListView => std::sync::Arc::new(list_view::list_view_detail(demo, fb)),
         WidgetKind::Autocomplete => std::sync::Arc::new(autocomplete::autocomplete_detail(
             &demo.autocomplete_value, &demo.autocomplete_open,
             &demo.autocomplete_limited_value, &demo.autocomplete_limited_open, fb,

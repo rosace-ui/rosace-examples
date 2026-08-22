@@ -294,6 +294,10 @@ pub struct WidgetDemoState {
     /// Shared by the Slider and Progress detail pages — dragging one
     /// visibly drives the other.
     pub slider: Atom<f32>,
+    /// The scrubbed-list demo: a controller the app drives, and the bar
+    /// position the list reports back into.
+    pub list_scrub: Atom<f32>,
+    pub list_ctrl: rosace::scroll::ScrollController,
     pub chip_selected: Atom<bool>,
     pub dropdown_selected: Atom<usize>,
     /// Each Dropdown instance on the detail screen needs its own open/closed
@@ -378,6 +382,8 @@ impl WidgetDemoState {
             text_input: ctx.state(String::new()),
             button_presses: ctx.state(0i32),
             slider: ctx.state(0.4f32),
+            list_scrub: ctx.state(0.0f32),
+            list_ctrl: ctx.state(rosace::scroll::ScrollController::new()).get(),
             chip_selected: ctx.state(true),
             dropdown_selected: ctx.state(0usize),
             dropdown_open: ctx.state(false),
