@@ -7,6 +7,7 @@
 //! rather than in any one control's handler.
 
 use rosace::prelude::*;
+use crate::present::BindOverlay;
 
 use crate::feedback::Feedback;
 
@@ -109,7 +110,7 @@ pub fn will_pop_scope_detail(
     };
 
     WillPopScope::new(
-        ScrollView::new(body).dialog(dialog_open, move || {
+        ScrollView::new(body).dialog_bound(&dialog_open, move || {
             std::sync::Arc::new(
                 Dialog::new("Discard changes?")
                     .message("Your draft has not been saved. Leaving now will lose it.")

@@ -3,6 +3,7 @@
 //! via `Toast::show`.
 
 use rosace::prelude::*;
+use crate::present::BindOverlay;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
     std::sync::Arc::new(
@@ -29,26 +30,26 @@ pub fn toast_detail(
             .child(labeled(
                 "Info",
                 Button::new("Show info toast")
-                    .on_press(move || Toast::show(&i, 2.5))
-                    .toast(info_open.clone(), || std::sync::Arc::new(Toast::info("Heads up!"))),
+                    .on_press(move || { i.set(true); let o = i.clone(); Toast::dismiss_after(2.5, move || o.set(false)); })
+                    .toast_bound(&info_open, || std::sync::Arc::new(Toast::info("Heads up!"))),
             ))
             .child(labeled(
                 "Success",
                 Button::new("Show success toast")
-                    .on_press(move || Toast::show(&s, 2.5))
-                    .toast(success_open.clone(), || std::sync::Arc::new(Toast::success("Saved!"))),
+                    .on_press(move || { s.set(true); let o = s.clone(); Toast::dismiss_after(2.5, move || o.set(false)); })
+                    .toast_bound(&success_open, || std::sync::Arc::new(Toast::success("Saved!"))),
             ))
             .child(labeled(
                 "Error",
                 Button::new("Show error toast")
-                    .on_press(move || Toast::show(&e, 2.5))
-                    .toast(error_open.clone(), || std::sync::Arc::new(Toast::error("Something went wrong"))),
+                    .on_press(move || { e.set(true); let o = e.clone(); Toast::dismiss_after(2.5, move || o.set(false)); })
+                    .toast_bound(&error_open, || std::sync::Arc::new(Toast::error("Something went wrong"))),
             ))
             .child(labeled(
                 "Custom background, color, accent, and radius",
                 Button::new("Show styled toast")
-                    .on_press(move || Toast::show(&c, 2.5))
-                    .toast(styled_open.clone(), || {
+                    .on_press(move || { c.set(true); let o = c.clone(); Toast::dismiss_after(2.5, move || o.set(false)); })
+                    .toast_bound(&styled_open, || {
                         std::sync::Arc::new(
                             Toast::info("Styled")
                                 .background(Color::rgb(30, 30, 40))

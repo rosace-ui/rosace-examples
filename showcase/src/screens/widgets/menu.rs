@@ -2,6 +2,7 @@
 //! content, presented via the co-located `.dropdown()` overlay API.
 
 use rosace::prelude::*;
+use crate::present::BindOverlay;
 
 use crate::feedback::Feedback;
 
@@ -31,7 +32,7 @@ pub fn menu_detail(open: &Atom<bool>, styled_open: &Atom<bool>, fb: &Feedback) -
                         // absorbed clicks and did nothing, same class of gap
                         // as Dropdown's own pre-toggle-fix bug).
                         .on_press(move || o.set(!o.get()))
-                        .dropdown(open.clone(), {
+                        .dropdown_bound(&open, {
                             let o = open.clone();
                             let fb = fb.clone();
                             move || {
@@ -56,7 +57,7 @@ pub fn menu_detail(open: &Atom<bool>, styled_open: &Atom<bool>, fb: &Feedback) -
                     let fb = fb.clone();
                     Button::new("Options")
                         .on_press(move || o.set(!o.get()))
-                        .dropdown(styled_open.clone(), move || {
+                        .dropdown_bound(&styled_open, move || {
                             std::sync::Arc::new(
                                 Menu::new()
                                     .min_width(220.0)

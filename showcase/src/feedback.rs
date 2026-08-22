@@ -27,6 +27,17 @@ pub struct Feedback {
 }
 
 impl Feedback {
+    /// Open the toast and schedule its own dismissal.
+    ///
+    /// The framework used to own both halves (`Toast::show(&atom, secs)`);
+    /// it now only schedules the close, because opening is the app's state
+    /// to change.
+    fn show_for(open: &Atom<bool>) {
+        open.set(true);
+        let open = open.clone();
+        Toast::dismiss_after(DWELL_SECS, move || open.set(false));
+    }
+
     pub fn new(open: Atom<bool>, message: Atom<String>) -> Self {
         Self { open, message }
     }
@@ -34,7 +45,7 @@ impl Feedback {
     /// Fire the toast directly — for handlers that already own a closure.
     pub fn say(&self, text: impl Into<String>) {
         self.message.set(text.into());
-        Toast::show(&self.open, DWELL_SECS);
+        Self::show_for(&self.open);
     }
 
     /// An `on_press`-shaped handler that reports `text`.
@@ -46,7 +57,7 @@ impl Feedback {
         let (open, message, text) = (self.open.clone(), self.message.clone(), text.into());
         move || {
             message.set(text.clone());
-            Toast::show(&open, DWELL_SECS);
+            Self::show_for(&open);
         }
     }
 
@@ -59,7 +70,7 @@ impl Feedback {
         let (open, message, label) = (self.open.clone(), self.message.clone(), label.into());
         move |v: T| {
             message.set(format!("{label}: {v}"));
-            Toast::show(&open, DWELL_SECS);
+            Self::show_for(&open);
         }
     }
 
@@ -67,8 +78,11 @@ impl Feedback {
     /// so individual demos never have to think about it.
     pub fn attach(&self, child: impl Widget + 'static) -> impl Widget {
         let message = self.message.clone();
-        child.toast(self.open.clone(), move || {
-            std::sync::Arc::new(Toast::info(message.get()))
-        })
+        let open = self.open.clone();
+        child
+            .toast(self.open.get(), move || {
+                std::sync::Arc::new(Toast::info(message.get()))
+            })
+            .on_open_change(move |v| open.set(v))
     }
 }

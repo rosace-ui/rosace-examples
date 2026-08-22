@@ -3,6 +3,7 @@
 //! `.modal()`/`.non_modal()`/`.full_page()`).
 
 use rosace::prelude::*;
+use crate::present::PresentExt;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
     std::sync::Arc::new(
@@ -17,31 +18,15 @@ fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
 pub fn dialog_detail(
     modal_open: &Atom<bool>, non_modal_open: &Atom<bool>, full_page_open: &Atom<bool>, styled_open: &Atom<bool>,
 ) -> impl Widget {
-    // `Dialog::emit`-style presentations must be pushed every build while
-    // open — non-modal and full-page aren't reachable through the
-    // `.dialog()` co-located API, which is always modal.
-    if non_modal_open.get() {
-        let o = non_modal_open.clone();
-        Dialog::new("Non-modal")
-            .message("The content behind this stays interactive.")
-            .non_modal()
-            .action("Close", move || o.set(false))
-            .emit(non_modal_open);
-    }
-    if full_page_open.get() {
-        let o = full_page_open.clone();
-        Dialog::new("Full page")
-            .message("Fills the entire window, like a pushed page.")
-            .full_page()
-            .action("Close", move || o.set(false))
-            .emit(full_page_open);
-    }
-
     let modal_trigger = modal_open.clone();
     let modal_trigger2 = modal_open.clone();
     let non_modal_trigger = non_modal_open.clone();
     let full_page_trigger = full_page_open.clone();
     let styled_trigger = styled_open.clone();
+    // Non-modal and full-page are not reachable through `.dialog()`, which is
+    // always modal — they go through `Dialog::emit`, which needs a paint
+    // context. `present` supplies one.
+    let (nm, fp) = (non_modal_open.clone(), full_page_open.clone());
 
     ScrollView::new(
         Column::new()
@@ -55,7 +40,7 @@ pub fn dialog_detail(
                 // nothing).
                 Button::new("Open modal dialog")
                     .on_press(move || modal_trigger.set(true))
-                    .dialog(modal_open.clone(), move || {
+                    .dialog(modal_open.get(), move || {
                         let o = modal_trigger2.clone();
                         std::sync::Arc::new(
                             Dialog::new("Delete item?")
@@ -77,7 +62,7 @@ pub fn dialog_detail(
                 "Custom width, radius, and colors",
                 Button::new("Open styled dialog")
                     .on_press(move || styled_trigger.set(true))
-                    .dialog(styled_open.clone(), {
+                    .dialog(styled_open.get(), {
                         let o = styled_open.clone();
                         move || std::sync::Arc::new(
                             Dialog::new("Styled")
@@ -90,4 +75,19 @@ pub fn dialog_detail(
                     }),
             )),
     )
+    .present(move |ctx| {
+        let o = nm.clone();
+        Dialog::new("Non-modal")
+            .message("The content behind this stays interactive.")
+            .non_modal()
+            .action("Close", { let o = o.clone(); move || o.set(false) })
+            .emit(ctx, nm.get(), move || o.set(false));
+
+        let o = fp.clone();
+        Dialog::new("Full page")
+            .message("Fills the entire window, like a pushed page.")
+            .full_page()
+            .action("Close", { let o = o.clone(); move || o.set(false) })
+            .emit(ctx, fp.get(), move || o.set(false));
+    })
 }

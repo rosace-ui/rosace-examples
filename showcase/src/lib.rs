@@ -5,6 +5,7 @@
 
 mod app;
 mod feedback;
+mod present;
 mod ffi;
 mod screens;
 mod theme;

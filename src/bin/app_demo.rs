@@ -244,7 +244,7 @@ fn overlays_screen(
                     Button::new("Delete…")
                         .variant(ButtonVariant::Danger)
                         .on_press(move || d_open.set(true))
-                        .dialog(dialog_open.clone(), move || {
+                        .dialog(dialog_open.get(), move || {
                             let cancel = d_cancel.clone();
                             let confirm = d_confirm.clone();
                             let toast = d_toast.clone();
@@ -254,16 +254,19 @@ fn overlays_screen(
                                     .action("Cancel", move || cancel.set(false))
                                     .destructive_action("Delete", move || {
                                         confirm.set(false);
-                                        Toast::show(&toast, 2.5);
+                                        toast.set(true);
+                                        let t = toast.clone();
+                                        Toast::dismiss_after(2.5, move || t.set(false));
                                     }),
                             )
-                        }),
+                        })
+                        .on_open_change({ let d = dialog_open.clone(); move |v| d.set(v) }),
                 )
                 .child(
                     Button::new("Menu ▾")
                         .variant(ButtonVariant::Secondary)
                         .on_press(move || m_open.set(true))
-                        .dropdown(menu_open.clone(), move || {
+                        .dropdown(menu_open.get(), move || {
                             let a = m_a.clone();
                             let b = m_b.clone();
                             Arc::new(
@@ -271,25 +274,31 @@ fn overlays_screen(
                                     .item("First action", move || a.set(false))
                                     .item("Second action", move || b.set(false)),
                             )
-                        }),
+                        })
+                        .on_open_change({ let m = menu_open.clone(); move |v| m.set(v) }),
                 )
                 .child(
                     Button::new("Bottom Sheet")
                         .variant(ButtonVariant::Ghost)
                         .on_press(move || s_open.set(true))
-                        .sheet(sheet_open.clone(), || {
+                        .sheet(sheet_open.get(), || {
                             Arc::new(Sheet::new(
                                 Column::new().spacing(8.0)
                                     .child(Text::title("Sheet title"))
                                     .child(Text::caption("Tap the scrim or press Escape to dismiss.")),
                             ))
-                        }),
+                        })
+                        .on_open_change({ let s = sheet_open.clone(); move |v| s.set(v) }),
                 )
                 .child(
                     Button::new("Toast")
                         .variant(ButtonVariant::Success)
-                        .on_press(move || Toast::show(&t_open, 2.5))
-                        .toast(toast_open.clone(), || {
+                        .on_press(move || {
+                            t_open.set(true);
+                            let t = t_open.clone();
+                            Toast::dismiss_after(2.5, move || t.set(false));
+                        })
+                        .toast(toast_open.get(), || {
                             Arc::new(Toast::success("Action completed"))
                         }),
                 ),

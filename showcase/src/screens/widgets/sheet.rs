@@ -3,6 +3,7 @@
 //! overlay API.
 
 use rosace::prelude::*;
+use crate::present::BindOverlay;
 
 fn labeled(title: &str, child: impl Widget + 'static) -> BoxedWidget {
     std::sync::Arc::new(
@@ -35,7 +36,7 @@ pub fn sheet_detail(
                     let o = default_open.clone();
                     Button::new("Open sheet")
                         .on_press(move || o.set(true))
-                        .sheet(default_open.clone(), || {
+                        .sheet_bound(&default_open, || {
                             std::sync::Arc::new(Sheet::new(sheet_body("Default sheet content")))
                         })
                 },
@@ -46,7 +47,7 @@ pub fn sheet_detail(
                     let o = detent_open.clone();
                     Button::new("Open half-height sheet")
                         .on_press(move || o.set(true))
-                        .sheet(detent_open.clone(), || {
+                        .sheet_bound(&detent_open, || {
                             std::sync::Arc::new(Sheet::new(sheet_body("Half the window")).detent(0.5))
                         })
                 },
@@ -57,7 +58,7 @@ pub fn sheet_detail(
                     let o = full_open.clone();
                     Button::new("Open full-screen sheet")
                         .on_press(move || o.set(true))
-                        .sheet(full_open.clone(), || {
+                        .sheet_bound(&full_open, || {
                             let mut col = Column::new().padding(EdgeInsets::all(16.0)).spacing(8.0);
                             for i in 0..30 {
                                 col = col.child(Text::new(format!("Row {i}")));
@@ -72,7 +73,7 @@ pub fn sheet_detail(
                     let o = styled_open.clone();
                     Button::new("Open styled sheet")
                         .on_press(move || o.set(true))
-                        .sheet(styled_open.clone(), || {
+                        .sheet_bound(&styled_open, || {
                             std::sync::Arc::new(
                                 Sheet::new(sheet_body("Styled sheet"))
                                     .no_handle()

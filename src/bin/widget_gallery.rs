@@ -392,26 +392,14 @@ impl Component for Gallery {
                     .spacing(12.0)
                     .child(Button::new("Show snackbar").width(130.0).on_press({
                         let o = snack_open.clone();
-                        move || Snackbar::show(&o, 2.5)
+                        move || {
+                            o.set(true);
+                            let o = o.clone();
+                            Snackbar::dismiss_after(2.5, move || o.set(false));
+                        }
                     }))
                     .child(Text::new("hover me (tooltip)").tooltip("hover me")),
             );
-
-        if dlg_modal.get() {
-            Dialog::new("Modal dialog")
-                .message("Blocks the background; tap the scrim or Escape to dismiss.")
-                .emit(&dlg_modal);
-        }
-        if dlg_nonmodal.get() {
-            Dialog::new("Non-modal")
-                .message("Background stays interactive.")
-                .non_modal()
-                .emit(&dlg_nonmodal);
-        }
-        if snack_open.get() {
-            // Overlay-presented: floats bottom-center above everything.
-            Snackbar::new("Item archived").action("UNDO", || {}).emit();
-        }
 
         // Bottom navigation showcased in its natural Scaffold slot.
         let bar = BottomNavigationBar::new()
@@ -424,9 +412,25 @@ impl Component for Gallery {
             .item(BottomNavItem::new("Themes").icon(Icon::new(IconKind::Settings).size(18.0)))
             .item(BottomNavItem::new("About").icon(Icon::new(IconKind::User).size(18.0)));
 
+        // Overlays are DECLARED on the tree now rather than emitted from
+        // `build()`: they are promoted during paint, so they survive
+        // cache-hit frames without a parallel registry.
         Scaffold::new(ScrollView::new(col))
             .app_bar(AppBar::new("Widget Gallery"))
             .bottom_bar(bar)
+            .dialog(dlg_modal.get(), || {
+                Arc::new(Dialog::new("Modal dialog")
+                    .message("Blocks the background; tap the scrim or Escape to dismiss."))
+            })
+            .on_open_change({ let d = dlg_modal.clone(); move |v| d.set(v) })
+            .dialog(dlg_nonmodal.get(), || {
+                Arc::new(Dialog::new("Non-modal").message("Background stays interactive."))
+            })
+            .on_open_change({ let d = dlg_nonmodal.clone(); move |v| d.set(v) })
+            .toast(snack_open.get(), || {
+                Arc::new(Snackbar::new("Item archived").action("UNDO", || {}))
+            })
+            .on_open_change({ let s = snack_open.clone(); move |v| s.set(v) })
             .boxed()
     }
 }
