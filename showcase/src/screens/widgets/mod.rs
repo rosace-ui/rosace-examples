@@ -29,7 +29,7 @@ mod drawer;
 mod dropdown;
 mod accordion;
 mod grid;
-mod hero;
+pub mod hero;
 mod image;
 mod menu;
 mod nav_rail;
@@ -195,7 +195,7 @@ fn widget_detail_body(
         WidgetKind::AspectRatio => std::sync::Arc::new(aspect_ratio::aspect_ratio_detail()),
         WidgetKind::BottomNav => std::sync::Arc::new(bottom_nav::bottom_nav_detail(&demo.bottom_nav_selected)),
         WidgetKind::AppBar => std::sync::Arc::new(app_bar::app_bar_detail()),
-        WidgetKind::Hero => std::sync::Arc::new(hero::hero_detail()),
+        WidgetKind::Hero => std::sync::Arc::new(hero::hero_detail(nav)),
         WidgetKind::ListView => std::sync::Arc::new(list_view::list_view_detail(demo, fb)),
         WidgetKind::Autocomplete => std::sync::Arc::new(autocomplete::autocomplete_detail(
             &demo.autocomplete_value, &demo.autocomplete_open,

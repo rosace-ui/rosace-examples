@@ -450,6 +450,10 @@ pub enum Screen {
     Home,
     Widgets,
     WidgetDetail(WidgetKind),
+    /// The Hero demo's destination. A hero morph only exists DURING a
+    /// navigation, so demonstrating one needs a real second screen — the
+    /// widget page itself cannot show it.
+    HeroDetail(usize),
     PlatformChannel,
 }
 
@@ -460,6 +464,7 @@ impl Screen {
             Screen::Home => "showcase",
             Screen::Widgets => "Widgets",
             Screen::WidgetDetail(kind) => kind.name(),
+            Screen::HeroDetail(_) => "Hero",
             Screen::PlatformChannel => "Platform Channel",
         }
     }
@@ -500,6 +505,9 @@ impl Component for AppRoot {
                     Screen::Home => std::sync::Arc::new(home_screen(&nav)),
                     Screen::Widgets => std::sync::Arc::new(widget_list_screen(&nav)),
                     Screen::WidgetDetail(kind) => widget_detail_screen(kind, &widget_demo, &nav),
+                    Screen::HeroDetail(i) => std::sync::Arc::new(
+                        crate::screens::widgets::hero::hero_destination(i, &nav),
+                    ),
                     Screen::PlatformChannel => {
                         std::sync::Arc::new(platform_channel_screen(&device_info_call, camera_permission))
                     }
