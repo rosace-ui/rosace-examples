@@ -59,7 +59,10 @@ impl Component for AppDemo {
     fn build(&self, ctx: &mut Context) -> BoxedWidget {
         // Hooks — unconditional, stable order.
         let nav = ScreenNav::new(ctx, initial_screen());
-        let page_ctrl = ScrollController::for_ctx(ctx);
+        // Persisted in component state so the position survives rebuilds —
+        // `for_ctx` used to do this AND subscribe the component, which made
+        // every wheel notch rebuild the app.
+        let page_ctrl = ctx.state(ScrollController::new()).get();
         let is_dark:     Atom<bool> = ctx.state(true);
         let dialog_open: Atom<bool> = ctx.state(false);
         let menu_open:   Atom<bool> = ctx.state(false);

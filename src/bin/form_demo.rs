@@ -9,9 +9,11 @@ struct FormDemo;
 
 impl Component for FormDemo {
     fn build(&self, ctx: &mut Context) -> BoxedWidget {
-        let name = FormField::for_ctx(ctx, "name").rule(Required).rule(MinLength(2));
-        let email = FormField::for_ctx(ctx, "email").rule(Required).rule(Email);
-        let phone = FormField::for_ctx(ctx, "phone").rule(MinLength(7));
+        let name = ctx.state(FormField::new("name")).get()
+            .rule(Required)
+            .rule(MinLength(2));
+        let email = ctx.state(FormField::new("email")).get().rule(Required).rule(Email);
+        let phone = ctx.state(FormField::new("phone")).get().rule(MinLength(7));
         let submitted: Atom<bool> = ctx.state(false);
 
         let form = Form::new()
