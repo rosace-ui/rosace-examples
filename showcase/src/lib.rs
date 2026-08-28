@@ -4,6 +4,16 @@
 //! `main`; the web build calls it from a `wasm-bindgen(start)` entry.
 
 mod app;
+
+/// The real application root, exported so it can be driven HEADLESSLY.
+///
+/// A showcase that merely compiles and launches proves very little: most of
+/// what broke during the engine refactor was invisible to the compiler and
+/// visible only on interaction — clicks landing on the wrong widget, hover
+/// sticking, a dialog that could not be dismissed. Constructing this against a
+/// `FrameEngine` lets a test navigate the real screens and click the real
+/// widgets with no window.
+pub use app::AppRoot;
 mod feedback;
 mod present;
 mod ffi;
