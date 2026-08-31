@@ -30,11 +30,15 @@ pub fn divider_detail() -> impl Widget {
             .child(labeled("Indented (e.g. to align past a leading icon)", Divider::new().indent(32.0)))
             .child(labeled(
                 "Vertical",
+                // A vertical divider fills the height it is GIVEN, so it needs
+                // a bounded one. This page sits in a vertical `ScrollView`,
+                // which offers infinite height — so the extent is set here
+                // explicitly rather than left to the parent.
                 Row::new()
-                    .cross_axis_alignment(CrossAxisAlignment::Stretch)
+                    .cross_axis_alignment(CrossAxisAlignment::Center)
                     .spacing(8.0)
                     .child(Text::new("Left"))
-                    .child(Divider::vertical())
+                    .child(Container::new().height(20.0).child(Divider::vertical()))
                     .child(Text::new("Right")),
             )),
     )
