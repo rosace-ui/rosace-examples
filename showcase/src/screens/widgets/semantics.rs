@@ -29,6 +29,25 @@ pub fn semantics_detail(fb: &Feedback) -> impl Widget {
             .spacing(22.0)
             .cross_axis_alignment(CrossAxisAlignment::Start)
             .child(labeled(
+                "Announcing something with no widget",
+                "Nothing on screen changes. With VoiceOver on you hear the message; \
+                 without it, nothing happens at all.",
+                Row::new()
+                    .spacing(8.0)
+                    .child(Button::new("Announce (polite)").on_press(|| {
+                        rosace::a11y::announce(
+                            "Copied to clipboard",
+                            rosace::a11y::Politeness::Polite,
+                        )
+                    }))
+                    .child(Button::new("Announce (assertive)").on_press(|| {
+                        rosace::a11y::announce(
+                            "Upload failed",
+                            rosace::a11y::Politeness::Assertive,
+                        )
+                    })),
+            ))
+            .child(labeled(
                 "Naming custom-painted content",
                 "Announced as \"Sales trend, image\" instead of being skipped entirely.",
                 Semantics::new(
