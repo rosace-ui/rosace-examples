@@ -454,6 +454,9 @@ pub enum Screen {
     /// navigation, so demonstrating one needs a real second screen — the
     /// widget page itself cannot show it.
     HeroDetail(usize),
+    /// The travel demo's destination — a different POSITION as well as a
+    /// different size, so the flight is a journey rather than a growth.
+    HeroFar(usize),
     PlatformChannel,
 }
 
@@ -465,6 +468,7 @@ impl Screen {
             Screen::Widgets => "Widgets",
             Screen::WidgetDetail(kind) => kind.name(),
             Screen::HeroDetail(_) => "Hero",
+            Screen::HeroFar(_) => "Hero",
             Screen::PlatformChannel => "Platform Channel",
         }
     }
@@ -507,6 +511,9 @@ impl Component for AppRoot {
                     Screen::WidgetDetail(kind) => widget_detail_screen(kind, &widget_demo, &nav),
                     Screen::HeroDetail(i) => std::sync::Arc::new(
                         crate::screens::widgets::hero::hero_destination(i, &nav),
+                    ),
+                    Screen::HeroFar(i) => std::sync::Arc::new(
+                        crate::screens::widgets::hero::hero_far_destination(i, &nav),
                     ),
                     Screen::PlatformChannel => {
                         std::sync::Arc::new(platform_channel_screen(&device_info_call, camera_permission))

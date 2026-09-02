@@ -34,6 +34,25 @@ fn swatch(i: usize) -> Container {
     Container::new().background(Color::rgb(r, g, b)).radius(12.0)
 }
 
+/// A second set of tags, for the travel demo. Distinct from the grid's so
+/// the two demos can never pair with each other.
+fn far_tag(i: usize) -> String {
+    format!("hero-far-{i}")
+}
+
+/// The travel demo's own colours. Deliberately NOT reused from `SWATCHES`:
+/// sharing one would make the two demos indistinguishable on screen, and a
+/// colour that appears twice defeats any test that identifies a hero by it.
+const FAR: [(u8, u8, u8); 2] = [
+    (72, 160, 168),
+    (206, 138, 60),
+];
+
+fn far_swatch(n: usize) -> Container {
+    let (r, g, b) = FAR[n];
+    Container::new().background(Color::rgb(r, g, b)).radius(12.0)
+}
+
 /// Source screen: a grid of small tiles, each pushing its own detail route.
 pub fn hero_detail(nav: &ScreenNav<Screen>) -> impl Widget {
     let mut grid = Row::new().spacing(12.0);
@@ -63,8 +82,62 @@ pub fn hero_detail(nav: &ScreenNav<Screen>) -> impl Widget {
                      interpolates one element between the two rects.",
                 )
                 .color(Color::rgb(120, 120, 120)),
+            )
+            .child(Text::new("Travelling across the screen")
+                .color(Color::rgb(120, 120, 120)))
+            .child(far_row(nav))
+            .child(
+                Text::caption(
+                    "The pair above sits at the two ENDS of the row and lands centred \
+                     near the bottom of the next screen, so the flight is a real \
+                     journey rather than a widget growing in place. Nothing about the \
+                     two screens knows where the other one puts it — the element is \
+                     matched by tag and the framework interpolates whatever rects the \
+                     two layouts happen to produce.",
+                )
+                .color(Color::rgb(120, 120, 120)),
             ),
     )
+}
+
+/// Two tiles pushed to opposite ends of the row, so each has a visibly
+/// different journey to the same destination.
+fn far_row(nav: &ScreenNav<Screen>) -> impl Widget {
+    let mut row = Row::new().main_axis_alignment(MainAxisAlignment::SpaceBetween);
+    for n in 0..FAR.len() {
+        let nav = nav.clone();
+        row = row.child(
+            far_swatch(n)
+                .width(48.0)
+                .height(48.0)
+                .on_press(move || nav.push(Screen::HeroFar(n)))
+                .hero_tag(far_tag(n)),
+        );
+    }
+    row
+}
+
+/// Destination for the travel demo: the same swatch, larger, low on the page
+/// and centred — a different position AND a different size from its source.
+pub fn hero_far_destination(n: usize, nav: &ScreenNav<Screen>) -> impl Widget {
+    let nav_back = nav.clone();
+    let n = n.min(FAR.len() - 1);
+
+    Scaffold::new(
+        Column::new()
+            .padding(EdgeInsets::all(16.0))
+            .spacing(16.0)
+            .cross_axis_alignment(CrossAxisAlignment::Center)
+            .child(Text::caption(
+                "It flew from the end of a row near the top to here — centred, lower, \
+                 and larger. Go back and it retraces the same path in reverse.",
+            ).color(Color::rgb(120, 120, 120)))
+            .child(Spacer::new(1.0))
+            .child(far_swatch(n).width(180.0).height(180.0).hero_tag(far_tag(n)))
+            .child(Spacer::new(1.0))
+            .child(Button::new("Back").on_press(move || { nav_back.pop(); })),
+    )
+    .app_bar(AppBar::new("Hero — travel").back_button(nav))
 }
 
 /// Destination screen: the same swatch, large, under the same tag.
