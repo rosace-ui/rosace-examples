@@ -29,13 +29,32 @@ pub fn pull_to_refresh_detail(
     PullToRefresh::new(ScrollView::new(list))
         .refreshing(busy.get())
         // The spinner is driven by `refreshing`, which the APP owns — the
-        // widget never flips it. A real app clears it when its network call
-        // returns; here the next frame clears it, so the spinner blinks
-        // rather than hanging forever.
+        // widget never flips it. That is the whole contract, and it is why
+        // this demo has to do real work to show anything: it sets the flag
+        // TRUE here, and clears it when the "request" finishes.
+        //
+        // Previously it only ever set the flag false, so `refreshing` was
+        // false on every frame and the spinner could not appear at all — the
+        // widget looked broken when the demo was.
         .on_refresh(move || {
-            c.set(c.get() + 1);
-            b.set(false);
-            f.say("Refreshed");
+            if b.get() {
+                return; // already refreshing — ignore a second pull
+            }
+            b.set(true);
+            f.say("Refreshing…");
+
+            // A real refresh takes time. Standing in for a network call with
+            // a background thread, which is also the honest demonstration
+            // that an `Atom` written from ANOTHER thread reaches the UI: the
+            // write is routed to the subscriber's thread rather than dirtying
+            // the writer's own.
+            let (c, b, f) = (c.clone(), b.clone(), f.clone());
+            std::thread::spawn(move || {
+                std::thread::sleep(std::time::Duration::from_millis(1200));
+                c.set(c.get() + 1);
+                b.set(false);
+                f.say("Refreshed");
+            });
         })
         .color(Color::rgb(120, 90, 220))
 }
