@@ -13,7 +13,7 @@ mod app;
 /// sticking, a dialog that could not be dismissed. Constructing this against a
 /// `FrameEngine` lets a test navigate the real screens and click the real
 /// widgets with no window.
-pub use app::AppRoot;
+pub use app::{AppRoot, Screen, WidgetKind};
 mod feedback;
 mod present;
 mod ffi;

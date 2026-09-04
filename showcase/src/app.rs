@@ -202,6 +202,14 @@ impl WidgetKind {
 
     /// The full catalog, in the order the widget list shows them — the
     /// single place that determines what's covered so far.
+    /// The URL slug for this widget, derived from [`WidgetKind::name`] rather
+    /// than listed again: "Text Input" -> "text-input". Fifty-odd variants
+    /// with a hand-written second table is fifty-odd chances for the two to
+    /// disagree, and a route that formats to a path nothing parses.
+    pub fn slug(&self) -> String {
+        self.name().to_lowercase().replace(' ', "-")
+    }
+
     pub const ALL: &'static [WidgetKind] = &[
         WidgetKind::Checkbox,
         WidgetKind::Radio,
@@ -443,20 +451,43 @@ impl WidgetDemoState {
     }
 }
 
+impl std::fmt::Display for WidgetKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.slug())
+    }
+}
+
+impl std::str::FromStr for WidgetKind {
+    type Err = ();
+    /// Looked up against `ALL` rather than a second match arm, for the same
+    /// reason `slug` is derived: one list, one source of truth.
+    fn from_str(s: &str) -> Result<Self, ()> {
+        WidgetKind::ALL.iter().copied().find(|k| k.slug() == s).ok_or(())
+    }
+}
+
 /// Every screen in the app. Add a variant + a match arm to add a route.
-#[derive(Clone, Copy, PartialEq, Hash)]
+#[rosace::routes]
+#[derive(Clone, Copy, PartialEq, Hash, Debug)]
 pub enum Screen {
+    #[route("/welcome")]
     Welcome,
+    #[route("/")]
     Home,
+    #[route("/widgets")]
     Widgets,
+    #[route("/widget/:kind")]
     WidgetDetail(WidgetKind),
     /// The Hero demo's destination. A hero morph only exists DURING a
     /// navigation, so demonstrating one needs a real second screen — the
     /// widget page itself cannot show it.
+    #[route("/hero/:i")]
     HeroDetail(usize),
     /// The travel demo's destination — a different POSITION as well as a
     /// different size, so the flight is a journey rather than a growth.
+    #[route("/hero-far/:i")]
     HeroFar(usize),
+    #[route("/platform-channel")]
     PlatformChannel,
 }
 
