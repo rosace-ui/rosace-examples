@@ -511,6 +511,9 @@ impl Component for AppRoot {
     fn build(&self, ctx: &mut Context) -> BoxedWidget {
         // Hooks — declared unconditionally, in a stable order.
         let nav = ScreenNav::new(ctx, Screen::Welcome);
+        // D031 — keep the address bar in step on web. A no-op on desktop and
+        // mobile, so it is called unconditionally.
+        nav.sync_url();
         // The welcome screen's reveal animation — owned here (not inside
         // welcome_screen itself) so it survives exactly like any other
         // app-level state, matching the project's established pattern of
